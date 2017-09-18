@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.8)
+project(CSCPP C)
+
+set(CMAKE_C_STANDARD 99)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
+
+add_executable(2.56 Chapter2/2.56.c)
+add_executable(2.60 Chapter2/2.60.c)
+add_executable(2.64 Chapter2/2.64.c)
+add_executable(2.68 Chapter2/2.68.c)
+add_executable(2.72 Chapter2/2.72.c)
+add_executable(2.76 Chapter2/2.76.c)
+add_executable(2.80 Chapter2/2.80.c)
+add_executable(2.84 Chapter2/2.84.c)
+add_executable(2.88 Chapter2/2.88.c)
+add_executable(2.92 Chapter2/2.92.c)
+add_executable(2.96 Chapter2/2.96.c)
