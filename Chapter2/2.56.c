@@ -32,7 +32,7 @@ void show_int(int x) {
  * 查看float在内存中的存储情况
  * @param x
  */
-void show_float(int x) {
+void show_float(float x) {
     show_bytes((byte_pointer) &x, sizeof(float));
 }
 
@@ -40,7 +40,7 @@ void show_float(int x) {
  * 查看double在内存中的存储情况
  * @param x
  */
-void show_double(int x) {
+void show_double(double x) {
     show_bytes((byte_pointer) &x, sizeof(double));
 }
 
