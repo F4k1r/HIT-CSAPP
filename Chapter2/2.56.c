@@ -45,6 +45,7 @@ void show_double(int x) {
 }
 
 int main() {
+    // 输出 ： 78 56 34 12
     show_int(0x12345678);
     return 0;
 }
