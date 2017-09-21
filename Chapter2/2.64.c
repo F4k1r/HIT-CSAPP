@@ -5,12 +5,12 @@
 #include <stdio.h>
 
 /**
- * 如果是偶数则返回1,否则返回零
+ * 如果是奇数则返回1,否则返回零
  * @param x
  * @return
  */
 int any_odd_one(unsigned x) {
-    return (x & 0x00000001) == 1;
+    return (x & 0x00000001);
 }
 
 int main() {
