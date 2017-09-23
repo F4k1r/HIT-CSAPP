@@ -9,7 +9,12 @@ unsigned int f2u(float f) {
     unsigned *u = (unsigned *) &f;
     return *u;
 }
-
+/**
+ * 返回 x<=y
+ * @param x
+ * @param y
+ * @return
+ */
 int float_le(float x, float y) {
     unsigned ux = f2u(x);
     unsigned uy = f2u(y);
