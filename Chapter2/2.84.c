@@ -6,9 +6,9 @@
 #include <limits.h>
 
 unsigned int f2u(float f) {
-    unsigned *u = (unsigned *) &f;
-    return *u;
+    return *((unsigned *) (&f));
 }
+
 /**
  * 返回 x<=y
  * @param x
@@ -41,6 +41,6 @@ int float_le(float x, float y) {
 }
 
 int main() {
-    printf("%x", float_le(1.0f,2.0f));
+    printf("%x", float_le(1.0f, 2.0f));
     return 0;
 }
