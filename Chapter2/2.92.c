@@ -5,8 +5,9 @@
 
 typedef unsigned float_bits;
 
-float U2F_BIT(unsigned U);
-
+float U2F_BIT(unsigned U) {
+    return *((float *) &U);
+}
 
 /**
  * 对于浮点数 f，这个函数返回 -f;如果 f 是 NaN，这个函数简单的返回 f。
@@ -45,10 +46,6 @@ int main() {
     }
 
     return 0;
-}
-
-float U2F_BIT(unsigned U) {
-    return *((float *) &U);
 }
 
 float_bits float_negate(float_bits f) {

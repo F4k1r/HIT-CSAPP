@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+
 typedef unsigned float_bits;
 
 /**
@@ -13,21 +14,20 @@ typedef unsigned float_bits;
  * @return
  */
 int float_f2i(float_bits f);
-float U2F_BIT(unsigned U) {
-    return *((float *) &U);
-}
+
 int main() {
-    for (float_bits i = 0; i != 0xFF; ++i) {
-        printf("%d   |  %d\n", (int) U2F_BIT(i), float_f2i(i));
+    for (float_bits i = 0x0; i != 0xFFFFFFFF; ++i) {
+        printf("%d\n", float_f2i(i));
     }
 
     return 0;
 }
+
 int float_f2i(float_bits f) {
     unsigned sign = f >> 31;
     unsigned exp = f >> 23 & 0xFF;
     unsigned frac = f & 0x7FFFFF;
-    if (exp == 0xFF && frac != 0)
+    if (exp == 0xFF)
         return 0x80000000;
     else if (exp > 150) {
         frac = ((1 << 23) | frac) << ((exp - 150));
