@@ -5,6 +5,6 @@
 #include <stdio.h>
 
 int main(){
-    printf("Hello 1160300202 å†¯äº‘é¾™\n");
+    printf("Hello 1160300202 ·ëÔÆÁú\n");
     return 0;
 }
