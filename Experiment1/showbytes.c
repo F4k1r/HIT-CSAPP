@@ -3,7 +3,6 @@
 //
 
 #include <stdio.h>
-#include <string.h>
 
 #define BFSIZE (20)
 #define BATCHSIZE (16)
@@ -26,12 +25,13 @@ int main(int argc, char **args) {
     printf("Open %s\n", args[1]);
     FILE *file = fopen(args[1], "r");
     char buffer[BFSIZE];
-    size_t length = fread(buffer, sizeof(char), BATCHSIZE, file);
-    while (length != 0) {
-        printf("文本：----------\n |%s|\n 16进制码:\n", buffer);
-        show_bytes((byte_pointer) buffer, length);
+    size_t length;
+    do {
         length = fread(buffer, sizeof(char), BATCHSIZE, file);
-    }
+        buffer[length] = '\0';
+        printf("文本：----------\n %s\n----------\n 16进制码:\n", buffer);
+        show_bytes((byte_pointer) buffer, length);
+    } while (length != 0);
     fclose(file);
     return 0;
 }
