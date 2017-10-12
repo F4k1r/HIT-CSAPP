@@ -16,3 +16,11 @@ showbytes 使用说明：
 ```bash
 .\showbyytes filename
 ```
+
+生成中间文件
+```bash
+Gcc –E hello.c –o hello.i  #\item 预处理，生成预编译文件（.i文件）：
+Gcc –S hello.i –o hello.s  #编译，生成汇编代码（.s文件）：
+Gcc –c hello.s –o hello.o  #汇编，生成目标文件（.o文件）：
+Gcc hello.o –o hello.out   #链接，生成可执行文件：
+```
