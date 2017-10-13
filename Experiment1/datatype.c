@@ -65,11 +65,13 @@ int main() {
     show_bytes((byte_pointer) &intArray, sizeof(intArray));
     structData.aChar = 'a';
     structData.aInt = 1;
-    printf("变量名:structData  变量值:|aChar:%c|aInt:%d|  变量地址:%p  内存:",
+    printf("变量名:structData  变量值:|aChar:%c|aInt:%d|  "
+                   "变量地址:%p  内存:",
            structData.aChar, structData.aInt, &structData);
     show_bytes((byte_pointer) &structData, sizeof(structData));
     unionData.uData = 0x12345678;
-    printf("变量名:unionData   变量值:|uData:%u|floatData:%f|  变量地址:%p  内存:",
+    printf("变量名:unionData   变量值:|uData:%u|floatData:%f|  "
+                   "变量地址:%p  内存:",
            unionData.uData, unionData.floatData, &unionData);
     show_bytes((byte_pointer) &unionData, sizeof(unionData));
     printf("变量名:enumData    变量值:%d  变量地址:%p  内存:",
