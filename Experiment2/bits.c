@@ -172,9 +172,10 @@ NOTES:
  *   Rating: 1
  */
 int lsbZero(int x) {
-  return 2;
+    return x & ((1 << 31) >> 30);
 }
-/* 
+
+/*
  * byteNot - bit-inversion to byte n from word x  
  *   Bytes numbered from 0 (LSB) to 3 (MSB)
  *   Examples: getByteNot(0x12345678,1) = 0x1234A978
@@ -183,9 +184,10 @@ int lsbZero(int x) {
  *   Rating: 2
  */
 int byteNot(int x, int n) {
-  return 2;
+    return x ^ (0xFF << (n << 3));
 }
-/* 
+
+/*
  *   byteXor - compare the nth byte of x and y, if it is same, return 0, if not, return 1
 
  *   example: byteXor(0x12345678, 0x87654321, 1) = 1
@@ -196,27 +198,30 @@ int byteNot(int x, int n) {
  *   Rating: 2 
  */
 int byteXor(int x, int y, int n) {
-  return 2;
+    return !(!(0xFF & ((x ^ y) >> (n << 3))));
 }
-/* 
+
+/*
  *   logicalAnd - x && y
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 20
  *   Rating: 3 
  */
 int logicalAnd(int x, int y) {
-  return 2;
+    return !(!x | !y);
 }
-/* 
+
+/*
  *   logicalOr - x || y
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 20
  *   Rating: 3 
  */
 int logicalOr(int x, int y) {
-  return 2;
+    return !(!x & !y);
 }
-/* 
+
+/*
  * rotateLeft - Rotate x to the left by n
  *   Can assume that 0 <= n <= 31
  *   Examples: rotateLeft(0x87654321,4) = 0x76543218
@@ -225,8 +230,9 @@ int logicalOr(int x, int y) {
  *   Rating: 3 
  */
 int rotateLeft(int x, int n) {
-  return 2;
+    return (x << n) | ((((0x01 << 31) >> 31) >> (~n + 33)) & (x >> (~n + 33)));
 }
+
 /*
  * parityCheck - returns 1 if x contains an odd number of 1's
  *   Examples: parityCheck(5) = 0, parityCheck(7) = 1
@@ -235,8 +241,9 @@ int rotateLeft(int x, int n) {
  *   Rating: 4
  */
 int parityCheck(int x) {
-  return 2;
+    return 2;
 }
+
 /*
  * mul2OK - Determine if can compute 2*x without overflow
  *   Examples: mul2OK(0x30000000) = 1
@@ -247,8 +254,9 @@ int parityCheck(int x) {
  *   Rating: 2
  */
 int mul2OK(int x) {
-  return 2;
+    return !(0x01 & ((x >> 31) ^ (x >> 30)));
 }
+
 /*
  * mult3div2 - multiplies by 3/2 rounding toward 0,
  *   Should exactly duplicate effect of C expression (x*3/2),
@@ -261,9 +269,10 @@ int mul2OK(int x) {
  *   Rating: 2
  */
 int mult3div2(int x) {
-  return 2;
+    return (x & (0x01 << 31)) | (~(0x01 << 31) & (x + (x >> 1)));
 }
-/* 
+
+/*
  * subOK - Determine if can compute x-y without overflow
  *   Example: subOK(0x80000000,0x80000000) = 1,
  *            subOK(0x80000000,0x70000000) = 0, 
@@ -272,9 +281,10 @@ int mult3div2(int x) {
  *   Rating: 3
  */
 int subOK(int x, int y) {
-  return 2;
+    return 2;
 }
-/* 
+
+/*
  * absVal - absolute value of x
  *   Example: absVal(-1) = 1.
  *   You may assume -TMax <= x <= TMax
@@ -283,9 +293,10 @@ int subOK(int x, int y) {
  *   Rating: 4
  */
 int absVal(int x) {
-  return 2;
+    return ((x >> 31) & (~(x - 1))) | (~(x >> 31) & x);
 }
-/* 
+
+/*
  * float_abs - Return bit-level equivalent of absolute value of f for
  *   floating point argument f.
  *   Both the argument and result are passed as unsigned int's, but
@@ -297,9 +308,13 @@ int absVal(int x) {
  *   Rating: 2
  */
 unsigned float_abs(unsigned uf) {
-  return 2;
+    unsigned sign = uf >> 31;
+    unsigned exp = uf >> 23 & 0xFF;
+    unsigned frac = uf & 0x7FFFFF;
+    return 2;
 }
-/* 
+
+/*
  * float_f2i - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
  *   Argument is passed as unsigned int, but
@@ -312,5 +327,8 @@ unsigned float_abs(unsigned uf) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+    unsigned sign = uf >> 31;
+    unsigned exp = uf >> 23 & 0xFF;
+    unsigned frac = uf & 0x7FFFFF;
+    return 2;
 }
