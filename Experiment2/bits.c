@@ -230,11 +230,13 @@ int logicalOr(int x, int y) {
  *   Rating: 3 
  */
 int rotateLeft(int x, int n) {
-    return (x << n) | ((((0x01 << 31) >> 31) >> (~n + 33)) & (x >> (~n + 33)));
+    int N_31 = ~n + 33;
+    return (x << n) | ((~0u >> N_31) & (x >> N_31));
 }
 
 /*
  * parityCheck - returns 1 if x contains an odd number of 1's
+ *   含1的数目为奇数时返回1
  *   Examples: parityCheck(5) = 0, parityCheck(7) = 1
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 20
@@ -269,7 +271,8 @@ int mul2OK(int x) {
  *   Rating: 2
  */
 int mult3div2(int x) {
-    return (x & (0x01 << 31)) | (~(0x01 << 31) & (x + (x >> 1)));
+    unsigned Max = 0x01u << 31;
+    return (x & Max) | (~Max & (x + (x >> 1)));
 }
 
 /*
@@ -281,7 +284,7 @@ int mult3div2(int x) {
  *   Rating: 3
  */
 int subOK(int x, int y) {
-    return 2;
+    return !((((x + ~y + 1) ^ x) >> 31) & 0x01);
 }
 
 /*
@@ -311,7 +314,7 @@ unsigned float_abs(unsigned uf) {
     unsigned sign = uf >> 31;
     unsigned exp = uf >> 23 & 0xFF;
     unsigned frac = uf & 0x7FFFFF;
-    return 2;
+    return uf & 0x7fffffff | (sign * ((exp == 0xFF && frac) << 31));
 }
 
 /*
@@ -327,8 +330,8 @@ unsigned float_abs(unsigned uf) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-    unsigned sign = uf >> 31;
-    unsigned exp = uf >> 23 & 0xFF;
-    unsigned frac = uf & 0x7FFFFF;
+//    unsigned sign = uf >> 31;
+//    unsigned exp = uf >> 23 & 0xFF;
+//    unsigned frac = uf & 0x7FFFFF;
     return 2;
 }
