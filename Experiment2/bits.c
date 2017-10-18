@@ -243,7 +243,12 @@ int rotateLeft(int x, int n) {
  *   Rating: 4
  */
 int parityCheck(int x) {
-    return 2;
+    x = (x >> 16) ^ x;
+    x = (x >> 8) ^ x;
+    x = (x >> 4) ^ x;
+    x = (x >> 2) ^ x;
+    x = (x >> 1) ^ x;
+    return x & 0x01;
 }
 
 /*
