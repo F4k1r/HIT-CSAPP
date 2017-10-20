@@ -289,7 +289,8 @@ int mult3div2(int x) {
  *   Rating: 3
  */
 int subOK(int x, int y) {
-    return !((((x + ~y + 1) ^ x) >> 31) & 0x01);
+    int samesign = ((x ^ y) >> 31) & 0x01;
+    return !(samesign & ((((x + ~y + 1) ^ x) >> 31) & 0x01));
 }
 
 /*
