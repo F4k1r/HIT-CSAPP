@@ -19,7 +19,7 @@ int lsbZero(int x) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/lsbzero}
+\includegraphics[width=0.9\linewidth]{figures/lsbZero}
 \caption{btest截图-lsbZero}
 \label{fig:lsbzero}
 \end{minipage}
@@ -40,7 +40,7 @@ int byteNot(int x, int n) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/byteNot}
 \caption{btest截图-byteNot}
 \label{fig:byteNote}
 \end{minipage}
@@ -63,7 +63,7 @@ int byteXor(int x, int y, int n) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/byteXor}
 \caption{btest截图-byteXor}
 \label{fig:byteXor}
 \end{minipage}
@@ -84,7 +84,7 @@ int logicalAnd(int x, int y) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/logicalAnd}
 \caption{btest截图-logicalAnd}
 \label{fig:logicalAnd}
 \end{minipage}
@@ -106,7 +106,7 @@ int logicalOr(int x, int y) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/logicalOr}
 \caption{btest截图-logicalOr}
 \label{fig:logicalOr}
 \end{minipage}
@@ -117,7 +117,7 @@ int logicalOr(int x, int y) {
 	
 \begin{lstlisting}[language = c]
 int rotateLeft(int x, int n) {
-	int N_31 = ~n + 33;
+    int N_31 = ~n + 33;
 	return (x << n) | ((~0u >> N_31) & (x >> N_31));
 }
 \end{lstlisting}
@@ -128,13 +128,39 @@ int rotateLeft(int x, int n) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/rotateLeft}
 \caption{btest截图-rotateLeft}
 \label{fig:rotateLeft}
 \end{minipage}
 \end{figure}
 
 \subsection{函数parityCheck的实现及说明}
+
+\textbf{程序如下：}
+
+\begin{lstlisting}[language = c]
+int parityCheck(int x) {
+    x = (x >> 16) ^ x;
+    x = (x >> 8) ^ x;
+    x = (x >> 4) ^ x;
+    x = (x >> 2) ^ x;
+    x = (x >> 1) ^ x;
+    return x & 0x01;
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \begin{minipage}[c]{0.5\linewidth}
+        \textbf{设计思想：}使用归并的思路进行各位的比较，若为偶数个1，最终会被全部抵消。
+    \end{minipage}
+    \begin{minipage}[c]{0.4\linewidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/parityCheck}
+        \caption{btest截图-parityCheck}
+        \label{fig:parityCheck}
+    \end{minipage}
+\end{figure}
+
 \subsection{函数mul2OK的实现及说明}
 \textbf{程序如下：}
 
@@ -150,20 +176,59 @@ int mul2OK(int x) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/mul2OK}
 \caption{btest截图-mul2OK}
 \label{fig:mul2OK}
 \end{minipage}
 \end{figure}
 
 \subsection{函数mult3div2的实现及说明}
+\begin{lstlisting}[language = c]
+int mult3div2(int x) {
+    int xmult3 = (x << 1) + x;
+    return (xmult3 >> 1) + (((xmult3 >> 31) & 1) & (((xmult3 << 31) >> 31) & 1));
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \begin{minipage}[c]{0.5\linewidth}
+        \textbf{设计思想：}左移一位再加$x$即$x*3$,右移一位即得$(x*3)/2$，当$x*3$的最高位和最低位都为0时需要+1。
+    \end{minipage}
+    \begin{minipage}[c]{0.4\linewidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/mult3div2}
+        \caption{btest截图-mult3div2}
+        \label{fig:mult3div2}
+    \end{minipage}
+\end{figure}
+
 \subsection{函数subOK的实现及说明}
+
+\begin{lstlisting}[language = c]
+int subOK(int x, int y) {
+  int samesign = ((x ^ y) >> 31) & 0x01;
+  return !(samesign & ((((x + ~y + 1) ^ x) >> 31) & 0x01));
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \begin{minipage}[c]{0.5\linewidth}
+        \textbf{设计思想：}重点是注意到两个数符号相同时不会产生溢出，当符号不同时，减数的符号位参加运算则是发生了溢出。
+    \end{minipage}
+    \begin{minipage}[c]{0.4\linewidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/subOK}
+        \caption{btest截图-subOK}
+        \label{fig:subOK}
+    \end{minipage}
+\end{figure}
+
 \subsection{函数absVal的实现及说明}
 \textbf{程序如下：}
 
 \begin{lstlisting}[language = c]
 int absVal(int x) {
-	return ((x >> 31) & (~(x - 1))) | (~(x >> 31) & x);
+  return ((x >> 31) & (~(x - 1))) | (~(x >> 31) & x);
 }
 \end{lstlisting}
 
@@ -173,9 +238,9 @@ int absVal(int x) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
-\caption{btest截图-mul2OK}
-\label{fig:mul2OK}
+\includegraphics[width=0.9\linewidth]{figures/absVal}
+\caption{btest截图-absVal}
+\label{fig:absVal}
 \end{minipage}
 \end{figure}
 
@@ -197,13 +262,13 @@ unsigned float_abs(unsigned uf) {
 \end{minipage}
 \begin{minipage}[c]{0.4\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/HIT}
+\includegraphics[width=0.9\linewidth]{figures/float_abs}
 \caption{btest截图-float-abs}
 \label{fig:float-abs}
 \end{minipage}
 \end{figure}
 
-\subsection{函数float\_f2i的实现及说明}
-\subsection{函数XXXX的实现及说明函数（CMU多出来的函数-不加分）}
+%\subsection{函数float\_f2i的实现及说明}
+%\subsection{函数XXXX的实现及说明函数（CMU多出来的函数-不加分）}
 
 

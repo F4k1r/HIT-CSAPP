@@ -4,26 +4,64 @@
 \end{center}
 
 \subsection{逻辑运算(1分)}
-
 \begin{lstlisting}
-    and eax,ebx
-    or eax,ebx
-    xor eax,ebx
-    not eax
+    and %eax,%ebx
+    or  %eax,%ebx
+    xor %eax,%ebx
+    not %eax
 \end{lstlisting}
 
 \subsection{无符号数左右移（2分）}
+\begin{lstlisting}
+    mov $4,%cl
+    shl %cl,%eax
+    shr $4,%ebx
+\end{lstlisting}
 
 \subsection{有符号左右移（2分）}
+\begin{lstlisting}
+    mov $4,%cl
+    sal %cl,%eax
+    sar $4,%ebx
+\end{lstlisting}
 
 \subsection{循环移位（2分）}
+\begin{lstlisting}
+    rol 1,%eax
+    ror 2,%ebx
+\end{lstlisting}
 
 \subsection{带进位位的循环移位（2分）}
+\begin{lstlisting}
+    rcl 1,%eax
+    rcr 2,%ebx
+\end{lstlisting}
 
 \subsection{测试、位测试BTx（2分）}
+\begin{lstlisting}
+    testb $1,%al
+    testw $2.%ax
+    testl $4,%eax
+    testq $8,%rax
+\end{lstlisting}
 
 \subsection{条件传送CMOVxx（2分）}
+\begin{lstlisting}
+    cmove   %eax,%ebx
+    cmoves  %eax,%ebx
+    cmoveng %eax,%ebx
+    cmova   %eax,%ebx
+\end{lstlisting}
 
 \subsection{条件设置SETCxx（1分）}
+\begin{lstlisting}
+    sete  %al
+    sets  %bl
+    setge %cl
+\end{lstlisting}
 
 \subsection{进位位操作（1分）}
+\begin{lstlisting}
+    add %eax,%ebx
+    adc %ecx,%edx
+\end{lstlisting}

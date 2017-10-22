@@ -276,8 +276,8 @@ int mul2OK(int x) {
  *   Rating: 2
  */
 int mult3div2(int x) {
-    unsigned Max = 0x01u << 31;
-    return (x & Max) | (~Max & (x + (x >> 1)));
+    int xmult3 = (x << 1) + x;
+    return (xmult3 >> 1) + ((xmult3 >> 31) & xmult3 & 0x01);
 }
 
 /*
