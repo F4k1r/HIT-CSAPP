@@ -231,7 +231,7 @@ int logicalOr(int x, int y) {
  */
 int rotateLeft(int x, int n) {
     int N_31 = ~n + 33;
-    return (x << n) | ((~0u >> N_31) & (x >> N_31));
+    return (x << n) | (~(~0x00 << n) & (x >> N_31));
 }
 
 /*
@@ -261,7 +261,7 @@ int parityCheck(int x) {
  *   Rating: 2
  */
 int mul2OK(int x) {
-    return !(0x01 & ((x >> 31) ^ (x >> 30)));
+    return (0x01 & ~((x >> 31) ^ (x >> 30)));
 }
 
 /*
@@ -302,7 +302,7 @@ int subOK(int x, int y) {
  *   Rating: 4
  */
 int absVal(int x) {
-    return ((x >> 31) & (~(x - 1))) | (~(x >> 31) & x);
+    return ((x >> 31) & (~(x + ~0))) | (~(x >> 31) & x);
 }
 
 /*
@@ -320,7 +320,7 @@ unsigned float_abs(unsigned uf) {
     unsigned sign = uf >> 31;
     unsigned exp = uf >> 23 & 0xFF;
     unsigned frac = uf & 0x7FFFFF;
-    return uf & 0x7fffffff | (sign * ((exp == 0xFF && frac) << 31));
+    return uf & 0x7fffffff + (sign * ((exp == 0xFF && frac) << 31));
 }
 
 /*
