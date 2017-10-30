@@ -13,7 +13,7 @@
   400f1f:	31 c0                	xor    %eax,%eax
 # sscanf 将值存入到 rsp+14 rsp+16 rsp+10里面去了
 # 只需要看这这三个值即可
-# sprintf(in,"%d %c %d",%rdx,%rcx,%r8)
+# sscanf(in,"%d %c %d",%rdx,%rcx,%r8)
   400f21:	4c 8d 44 24 14       	lea    0x14(%rsp),%r8
   400f26:	48 8d 4c 24 0f       	lea    0x0f(%rsp),%rcx
   400f2b:	48 8d 54 24 10       	lea    0x10(%rsp),%rdx
@@ -53,10 +53,13 @@
 
 ```asm
 0000000000401070 <func4>:
+# func4(a,b)
   401070:	85 ff                	test   %edi,%edi
+# if b <= 0 return 0;
   401072:	7e 2b                	jle    40109f <func4+0x2f>
   401074:	89 f0                	mov    %esi,%eax
   401076:	83 ff 01             	cmp    $0x1,%edi
+# if b ==1 return a;
   401079:	74 2e                	je     4010a9 <func4+0x39>
   40107b:	41 54                	push   %r12
   40107d:	55                   	push   %rbp
@@ -64,11 +67,14 @@
   40107f:	89 f5                	mov    %esi,%ebp
   401081:	89 fb                	mov    %edi,%ebx
   401083:	8d 7f ff             	lea    -0x1(%rdi),%edi
+# c = func4(a,b-1)
   401086:	e8 e5 ff ff ff       	callq  401070 <func4>
   40108b:	44 8d 64 05 00       	lea    0x0(%rbp,%rax,1),%r12d
   401090:	8d 7b fe             	lea    -0x2(%rbx),%edi
   401093:	89 ee                	mov    %ebp,%esi
+# c += func4(a,b-2)
   401095:	e8 d6 ff ff ff       	callq  401070 <func4>
+# return a+c
   40109a:	44 01 e0             	add    %r12d,%eax
   40109d:	eb 06                	jmp    4010a5 <func4+0x35>
   40109f:	b8 00 00 00 00       	mov    $0x0,%eax
@@ -87,6 +93,8 @@
   4010bf:	48 89 e1             	mov    %rsp,%rcx
   4010c2:	48 8d 54 24 04       	lea    0x4(%rsp),%rdx
 # 0x40260f:"%d %d"
+# sscanf(in,"%d %d",%rdx,%rcx)
+# sscanf(in,"%d %d",%rsp+4,%rsp)
   4010c7:	be 0f 26 40 00       	mov    $0x40260f,%esi
   4010cc:	e8 df fa ff ff       	callq  400bb0 <__isoc99_sscanf@plt>
   4010d1:	83 f8 02             	cmp    $0x2,%eax
@@ -94,10 +102,13 @@
   4010d6:	8b 04 24             	mov    (%rsp),%eax
   4010d9:	83 e8 02             	sub    $0x2,%eax
   4010dc:	83 f8 02             	cmp    $0x2,%eax
+# (%rsp + 4) <= 4 否则爆炸
   4010df:	76 05                	jbe    4010e6 <phase_4+0x3b>
   4010e1:	e8 e0 03 00 00       	callq  4014c6 <explode_bomb>
   4010e6:	8b 34 24             	mov    (%rsp),%esi
   4010e9:	bf 07 00 00 00       	mov    $0x7,%edi
+# %eax = func4(%esi,%edi)
+# %eax = func4(%rsp+4,7)
   4010ee:	e8 7d ff ff ff       	callq  401070 <func4>
   4010f3:	3b 44 24 04          	cmp    0x4(%rsp),%eax
   4010f7:	74 05                	je     4010fe <phase_4+0x53>
