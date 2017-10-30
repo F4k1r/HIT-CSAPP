@@ -133,14 +133,22 @@
   401127:	00 00 
   401129:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
   40112e:	31 c0                	xor    %eax,%eax
+# 判断字符长度 不等于6则爆炸
   401130:	e8 74 02 00 00       	callq  4013a9 <string_length>
   401135:	83 f8 06             	cmp    $0x6,%eax
   401138:	74 05                	je     40113f <phase_5+0x27>
   40113a:	e8 87 03 00 00       	callq  4014c6 <explode_bomb>
+# %eax = 0
   40113f:	b8 00 00 00 00       	mov    $0x0,%eax
+# %rbx -> "输入的字符串"
+# %rdx -> "输入的字符串"
   401144:	0f b6 14 03          	movzbl (%rbx,%rax,1),%edx
+# %rdx 取低4位
   401148:	83 e2 0f             	and    $0xf,%edx
 # 0x4024f0:"maduiersnfotvbylSo you think you can stop the bomb with ctrl-c, do you?"
+# 查表取得值,表项如下
+# maduiersnfotvbyl
+# 0123456789abcdef
   40114b:	0f b6 92 f0 24 40 00 	movzbl 0x4024f0(%rdx),%edx
   401152:	88 14 04             	mov    %dl,(%rsp,%rax,1)
   401155:	48 83 c0 01          	add    $0x1,%rax
@@ -148,6 +156,9 @@
   40115d:	75 e5                	jne    401144 <phase_5+0x2c>
   40115f:	c6 44 24 06 00       	movb   $0x0,0x6(%rsp)
 # 0x4024a7:"sabres"
+# 推出表项  71d657
+# IN:       gamfeg
+# 只需输入的字母的ASCII码的低8位和表项值相同即可
   401164:	be a7 24 40 00       	mov    $0x4024a7,%esi
   401169:	48 89 e7             	mov    %rsp,%rdi
   40116c:	e8 56 02 00 00       	callq  4013c7 <strings_not_equal>
