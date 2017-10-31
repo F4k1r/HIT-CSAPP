@@ -106,11 +106,145 @@ esi常作为参数使用，这里可以看到是比较字符串，推测0x402440
 
 \paragraph{破解过程：}
 
+\begin{lstlisting}
+0000000000401070 <func4>:
+# func4(a,b)
+401070:	85 ff                	test   %edi,%edi
+# if b <= 0 return 0;
+401072:	7e 2b                	jle    40109f <func4+0x2f>
+401074:	89 f0                	mov    %esi,%eax
+401076:	83 ff 01             	cmp    $0x1,%edi
+# if b ==1 return a;
+401079:	74 2e                	je     4010a9 <func4+0x39>
+40107b:	41 54                	push   %r12
+40107d:	55                   	push   %rbp
+40107e:	53                   	push   %rbx
+40107f:	89 f5                	mov    %esi,%ebp
+401081:	89 fb                	mov    %edi,%ebx
+401083:	8d 7f ff             	lea    -0x1(%rdi),%edi
+# c = func4(a,b-1)
+401086:	e8 e5 ff ff ff       	callq  401070 <func4>
+40108b:	44 8d 64 05 00       	lea    0x0(%rbp,%rax,1),%r12d
+401090:	8d 7b fe             	lea    -0x2(%rbx),%edi
+401093:	89 ee                	mov    %ebp,%esi
+# c += func4(a,b-2)
+401095:	e8 d6 ff ff ff       	callq  401070 <func4>
+# return a+c
+40109a:	44 01 e0             	add    %r12d,%eax
+40109d:	eb 06                	jmp    4010a5 <func4+0x35>
+40109f:	b8 00 00 00 00       	mov    $0x0,%eax
+4010a4:	c3                   	retq   
+4010a5:	5b                   	pop    %rbx
+4010a6:	5d                   	pop    %rbp
+4010a7:	41 5c                	pop    %r12
+4010a9:	f3 c3                	repz retq 
+
+00000000004010ab <phase_4>:
+4010ab:	48 83 ec 18          	sub    $0x18,%rsp
+4010af:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
+4010b6:	00 00 
+4010b8:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+4010bd:	31 c0                	xor    %eax,%eax
+4010bf:	48 89 e1             	mov    %rsp,%rcx
+4010c2:	48 8d 54 24 04       	lea    0x4(%rsp),%rdx
+# 0x40260f:"%d %d"
+# sscanf(in,"%d %d",%rdx,%rcx)
+# sscanf(in,"%d %d",%rsp+4,%rsp)
+4010c7:	be 0f 26 40 00       	mov    $0x40260f,%esi
+4010cc:	e8 df fa ff ff       	callq  400bb0 <__isoc99_sscanf@plt>
+4010d1:	83 f8 02             	cmp    $0x2,%eax
+4010d4:	75 0b                	jne    4010e1 <phase_4+0x36>
+4010d6:	8b 04 24             	mov    (%rsp),%eax
+4010d9:	83 e8 02             	sub    $0x2,%eax
+4010dc:	83 f8 02             	cmp    $0x2,%eax
+# (%rsp + 4) <= 4 否则爆炸
+4010df:	76 05                	jbe    4010e6 <phase_4+0x3b>
+4010e1:	e8 e0 03 00 00       	callq  4014c6 <explode_bomb>
+4010e6:	8b 34 24             	mov    (%rsp),%esi
+4010e9:	bf 07 00 00 00       	mov    $0x7,%edi
+# %eax = func4(%esi,%edi)
+# %eax = func4(%rsp+4,7)
+4010ee:	e8 7d ff ff ff       	callq  401070 <func4>
+4010f3:	3b 44 24 04          	cmp    0x4(%rsp),%eax
+4010f7:	74 05                	je     4010fe <phase_4+0x53>
+4010f9:	e8 c8 03 00 00       	callq  4014c6 <explode_bomb>
+4010fe:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
+401103:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
+40110a:	00 00 
+40110c:	74 05                	je     401113 <phase_4+0x68>
+40110e:	e8 ed f9 ff ff       	callq  400b00 <__stack_chk_fail@plt>
+401113:	48 83 c4 18          	add    $0x18,%rsp
+401117:	c3                   	retq   
+\end{lstlisting}
+
+\begin{lstlisting}[language = c]
+//func_4可等价为如下函数
+int func_4(int a, int b) {
+  if (b <= 0)
+    return 0;
+  if (b == 1)
+    return a;
+  return a + func(a, b - 1) + func(a, b - 2);
+}
+\end{lstlisting}
+
+
 \subsection{阶段5的破解与分析}
 
-\paragraph{密码如下：}
+\paragraph{密码如下：}gamfeg
 
 \paragraph{破解过程：}
+
+\begin{lstlisting}
+0000000000401118 <phase_5>:
+401118:	53                   	push   %rbx
+401119:	48 83 ec 10          	sub    $0x10,%rsp
+40111d:	48 89 fb             	mov    %rdi,%rbx
+401120:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
+401127:	00 00 
+401129:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+40112e:	31 c0                	xor    %eax,%eax
+# 判断字符长度 不等于6则爆炸
+401130:	e8 74 02 00 00       	callq  4013a9 <string_length>
+401135:	83 f8 06             	cmp    $0x6,%eax
+401138:	74 05                	je     40113f <phase_5+0x27>
+40113a:	e8 87 03 00 00       	callq  4014c6 <explode_bomb>
+# %eax = 0
+40113f:	b8 00 00 00 00       	mov    $0x0,%eax
+# %rbx -> "输入的字符串"
+# %rdx -> "输入的字符串"
+401144:	0f b6 14 03          	movzbl (%rbx,%rax,1),%edx
+# %rdx 取低4位
+401148:	83 e2 0f             	and    $0xf,%edx
+# 0x4024f0:"maduiersnfotvbylSo you think you can stop the bomb with ctrl-c, do you?"
+# 查表取得值,表项如下
+# maduiersnfotvbyl
+# 0123456789abcdef
+40114b:	0f b6 92 f0 24 40 00 	movzbl 0x4024f0(%rdx),%edx
+401152:	88 14 04             	mov    %dl,(%rsp,%rax,1)
+401155:	48 83 c0 01          	add    $0x1,%rax
+401159:	48 83 f8 06          	cmp    $0x6,%rax
+40115d:	75 e5                	jne    401144 <phase_5+0x2c>
+40115f:	c6 44 24 06 00       	movb   $0x0,0x6(%rsp)
+# 0x4024a7:"sabres"
+# 推出表项  71d657
+# IN:       gamfeg
+# 只需输入的字母的ASCII码的低8位和表项值相同即可
+401164:	be a7 24 40 00       	mov    $0x4024a7,%esi
+401169:	48 89 e7             	mov    %rsp,%rdi
+40116c:	e8 56 02 00 00       	callq  4013c7 <strings_not_equal>
+401171:	85 c0                	test   %eax,%eax
+401173:	74 05                	je     40117a <phase_5+0x62>
+401175:	e8 4c 03 00 00       	callq  4014c6 <explode_bomb>
+40117a:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
+40117f:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
+401186:	00 00 
+401188:	74 05                	je     40118f <phase_5+0x77>
+40118a:	e8 71 f9 ff ff       	callq  400b00 <__stack_chk_fail@plt>
+40118f:	48 83 c4 10          	add    $0x10,%rsp
+401193:	5b                   	pop    %rbx
+401194:	c3                   	retq   
+\end{lstlisting}
 
 \subsection{阶段6的破解与分析}
 
