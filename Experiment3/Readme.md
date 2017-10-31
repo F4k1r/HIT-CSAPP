@@ -191,58 +191,105 @@
   4011b2:	e8 31 03 00 00       	callq  4014e8 <read_six_numbers>
   4011b7:	49 89 e4             	mov    %rsp,%r12
   4011ba:	41 bd 00 00 00 00    	mov    $0x0,%r13d
+# while(true){
   4011c0:	4c 89 e5             	mov    %r12,%rbp
   4011c3:	41 8b 04 24          	mov    (%r12),%eax
   4011c7:	83 e8 01             	sub    $0x1,%eax
+# %rbp = %r12 -> "1 2 3 4 5 6"
+# %r13d = 0
+# %eax = *(%r12)-1
+# 每个数 都小于等于 6
   4011ca:	83 f8 05             	cmp    $0x5,%eax
   4011cd:	76 05                	jbe    4011d4 <phase_6+0x3f>
   4011cf:	e8 f2 02 00 00       	callq  4014c6 <explode_bomb>
+# %r13d += 1
+# if(%r13d == 0x6) goto LABEL2
+#   break;
   4011d4:	41 83 c5 01          	add    $0x1,%r13d
   4011d8:	41 83 fd 06          	cmp    $0x6,%r13d
   4011dc:	74 3d                	je     40121b <phase_6+0x86>
+# %ebx = %r13d
   4011de:	44 89 eb             	mov    %r13d,%ebx
+# %rax = %ebx * 2
+# do{
   4011e1:	48 63 c3             	movslq %ebx,%rax
+# %eax = &(%rsp + %rax * 4)
   4011e4:	8b 04 84             	mov    (%rsp,%rax,4),%eax
   4011e7:	39 45 00             	cmp    %eax,0x0(%rbp)
+# if(%eax == %rbp) bomb
   4011ea:	75 05                	jne    4011f1 <phase_6+0x5c>
   4011ec:	e8 d5 02 00 00       	callq  4014c6 <explode_bomb>
   4011f1:	83 c3 01             	add    $0x1,%ebx
   4011f4:	83 fb 05             	cmp    $0x5,%ebx
   4011f7:	7e e8                	jle    4011e1 <phase_6+0x4c>
+# %ebx += 1
+# }while(ebx <= 5); 每个数都不相等
   4011f9:	49 83 c4 04          	add    $0x4,%r12
   4011fd:	eb c1                	jmp    4011c0 <phase_6+0x2b>
+# } 
+# 输入的数字是1-6的全排列
+# { 将链表中的数据按照你输入的值取出到 %rsp+24之上
+# node = node -> next
+# {
   4011ff:	48 8b 52 08          	mov    0x8(%rdx),%rdx
+# %eax ++
   401203:	83 c0 01             	add    $0x1,%eax
+# %eax == %ecx ?
   401206:	39 c8                	cmp    %ecx,%eax
   401208:	75 f5                	jne    4011ff <phase_6+0x6a>
+# }访问链表的各个节点，找到你输入的数字所对应序号的节点
+# *(%rsp+0x20+2*%rsi) = %rdx
+# 将链表的指针存入栈中
   40120a:	48 89 54 74 20       	mov    %rdx,0x20(%rsp,%rsi,2)
   40120f:	48 83 c6 04          	add    $0x4,%rsi
   401213:	48 83 fe 18          	cmp    $0x18,%rsi
   401217:	75 07                	jne    401220 <phase_6+0x8b>
   401219:	eb 19                	jmp    401234 <phase_6+0x9f>
+#LABEL2:
   40121b:	be 00 00 00 00       	mov    $0x0,%esi
+# %ecx中存入的是你所输入的值
   401220:	8b 0c 34             	mov    (%rsp,%rsi,1),%ecx
   401223:	b8 01 00 00 00       	mov    $0x1,%eax
+# 0x6032f0是个链表的头
+#   地址   | 内容  | 序号 |   next  
+# 0x6032f0 : 0x100   0x01   next-> 0x603300
+# 0x603300 : 0x12e   0x02   next-> 0x603310
+# 0x603310 : 0x234   0x03   next-> 0x603320
+# 0x603320 : 0x139   0x04   next-> 0x603330
+# 0x603330 : 0x0b9   0x05   next-> 0x603340
+# 0x603340 : 0x142   0x06   next-> NULL
+# 3 6 4 2 1 5
   401228:	ba f0 32 60 00       	mov    $0x6032f0,%edx
   40122d:	83 f9 01             	cmp    $0x1,%ecx
   401230:	7f cd                	jg     4011ff <phase_6+0x6a>
   401232:	eb d6                	jmp    40120a <phase_6+0x75>
+#  }
   401234:	48 8b 5c 24 20       	mov    0x20(%rsp),%rbx
   401239:	48 8d 44 24 20       	lea    0x20(%rsp),%rax
   40123e:	48 8d 74 24 48       	lea    0x48(%rsp),%rsi
   401243:	48 89 d9             	mov    %rbx,%rcx
+# %rbx = node[0]
+# %rax = node
+# %rsi = node[6]
+# %rcx = %rbx
+# do{
+# %rdx = node[x] -> next
   401246:	48 8b 50 08          	mov    0x8(%rax),%rdx
   40124a:	48 89 51 08          	mov    %rdx,0x8(%rcx)
   40124e:	48 83 c0 08          	add    $0x8,%rax
   401252:	48 89 d1             	mov    %rdx,%rcx
   401255:	48 39 f0             	cmp    %rsi,%rax
   401258:	75 ec                	jne    401246 <phase_6+0xb1>
+# }while(%rax != %rsi);
+# 取得一个数组value[6]中存的是取出的各节点存储的值，按照所输入的数据取出
   40125a:	48 c7 42 08 00 00 00 	movq   $0x0,0x8(%rdx)
   401261:	00 
   401262:	bd 05 00 00 00       	mov    $0x5,%ebp
   401267:	48 8b 43 08          	mov    0x8(%rbx),%rax
   40126b:	8b 00                	mov    (%rax),%eax
   40126d:	39 03                	cmp    %eax,(%rbx)
+# 把每个数字和它的下一个数字做比较 当前的数字要大于下一个数字，否则爆炸
+# 按值取出序号可得:3 6 4 2 1 5
   40126f:	7d 05                	jge    401276 <phase_6+0xe1>
   401271:	e8 50 02 00 00       	callq  4014c6 <explode_bomb>
   401276:	48 8b 5b 08          	mov    0x8(%rbx),%rbx
@@ -262,6 +309,45 @@
 ```
 
 ## Secret
+```asm
+000000000040164d <phase_defused>:
+  40164d:	48 83 ec 78          	sub    $0x78,%rsp
+  401651:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
+  401658:	00 00 
+  40165a:	48 89 44 24 68       	mov    %rax,0x68(%rsp)
+  40165f:	31 c0                	xor    %eax,%eax
+  401661:	83 3d 24 21 20 00 06 	cmpl   $0x6,0x202124(%rip)        # 60378c <num_input_strings>
+  401668:	75 5e                	jne    4016c8 <phase_defused+0x7b>
+  40166a:	4c 8d 44 24 10       	lea    0x10(%rsp),%r8
+  40166f:	48 8d 4c 24 0c       	lea    0xc(%rsp),%rcx
+  401674:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx
+  401679:	be 59 26 40 00       	mov    $0x402659,%esi
+  40167e:	bf 90 38 60 00       	mov    $0x603890,%edi
+  401683:	e8 28 f5 ff ff       	callq  400bb0 <__isoc99_sscanf@plt>
+  401688:	83 f8 03             	cmp    $0x3,%eax
+  40168b:	75 31                	jne    4016be <phase_defused+0x71>
+  40168d:	be 62 26 40 00       	mov    $0x402662,%esi
+  401692:	48 8d 7c 24 10       	lea    0x10(%rsp),%rdi
+  401697:	e8 2b fd ff ff       	callq  4013c7 <strings_not_equal>
+  40169c:	85 c0                	test   %eax,%eax
+  40169e:	75 1e                	jne    4016be <phase_defused+0x71>
+  4016a0:	bf 38 25 40 00       	mov    $0x402538,%edi
+  4016a5:	e8 36 f4 ff ff       	callq  400ae0 <puts@plt>
+  4016aa:	bf 60 25 40 00       	mov    $0x402560,%edi
+  4016af:	e8 2c f4 ff ff       	callq  400ae0 <puts@plt>
+  4016b4:	b8 00 00 00 00       	mov    $0x0,%eax
+  4016b9:	e8 1f fc ff ff       	callq  4012dd <secret_phase>
+  4016be:	bf 98 25 40 00       	mov    $0x402598,%edi
+  4016c3:	e8 18 f4 ff ff       	callq  400ae0 <puts@plt>
+  4016c8:	48 8b 44 24 68       	mov    0x68(%rsp),%rax
+  4016cd:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
+  4016d4:	00 00 
+  4016d6:	74 05                	je     4016dd <phase_defused+0x90>
+  4016d8:	e8 23 f4 ff ff       	callq  400b00 <__stack_chk_fail@plt>
+  4016dd:	48 83 c4 78          	add    $0x78,%rsp
+  4016e1:	c3                   	retq   
+```
+
 ```asm
 000000000040129f <fun7>:
   40129f:	48 83 ec 08          	sub    $0x8,%rsp
@@ -284,7 +370,9 @@
   4012d3:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
   4012d8:	48 83 c4 08          	add    $0x8,%rsp
   4012dc:	c3                   	retq   
+```
 
+```asm
 00000000004012dd <secret_phase>:
   4012dd:	53                   	push   %rbx
   4012de:	e8 44 02 00 00       	callq  401527 <read_line>
