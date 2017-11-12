@@ -1,0 +1,11 @@
+
+bang_asm.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <.text>:
+   0:	c7 04 25 a4 61 60 00 	movl   $0x51f6fe1b,0x6061a4
+   7:	1b fe f6 51 
+   b:	68 87 10 40 00       	pushq  $0x401087
+  10:	c3                   	retq   
