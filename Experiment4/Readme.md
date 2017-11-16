@@ -78,6 +78,7 @@
    5:	68 3b 10 40 00       	pushq  $0x40103b         #fizz
    a:	c3                   	retq
 ```
+**特别注意，这里的cookie和下面的地址都要加上$，是立即数**
 运行`gcc -c fizz.s`将汇编编译，而后运行`objdump fizz.s > fizz_asm.txt`即可完成。
 将edi修改为我的cookies。
 最终得到的答案如下:
