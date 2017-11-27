@@ -108,12 +108,12 @@ long switch3(long *p1, long *p2, mode_t action) {
 ```
 
 ## 3.64
-```c
+```asm
 store_ele:
     leaq  (%rsi, %rsi, 2), %rax  # %rax = 3 * j
     leaq  (%rsi, %rax, 4), %rax  # %rax = 13 * j
     leaq  %rdi, %rsi             # %rsi = i
-    salq  $6, %rsi               # %rsi * = 64
+    salq  $6, %rsi               # %rsi *= 64
     addq  %rsi, %rdi             # %rdi = 65 * i
     addq  %rax, %rdi             # %rdi = 65 * i + 13 * j
     addq  %rdi, %rdx             # %rdx = 65 * i + 13 * j + k
@@ -167,20 +167,27 @@ NC(n) = 4 * n + 1
 ```
 
 ## 3.68
-
 首先,结构体str2类型的最长单位是long,所以按照8位对齐,str1同样,也是按照8位对齐.
+```c
+ty
+```
+
 再来看汇编代码:
+
 ```asm
 setVal:
-    movslq  8(%rsi), %rax 
-    # 说明str2的t从第8位开始的,因为按照8位对齐,因此sizeof(array[B])小于等于8
-    # 因为下边的t是int类型,只占4个字节,为了不让t与array共占8个字节,所以sizeof(array[B])大于4,因此可得5<=B<=8.
-    addq    32(%rsi), %rax
-    # 说明str2的u从第32位开始的,因此t与s占了24个字节,可以将2个s放在t的一行,占满8个字节,剩下的s占据两行,因此可得7<=A<=10.
-    movq    %rax, 184(%rdi)
+    movslq  8(%rsi), %rax       # %rax = *(q + 8) => q->t
+    # t是int类型,占4个字节,为了不让t与array共占8个字节,所以sizeof(array[B])大于4,因此可得5<=B<=8.
+    
+    addq    32(%rsi), %rax      # %rax = *(%rsi +32) => q->u
+    # 说明str2的u从第32位开始的,因此t与s占了24个字节,可以将2个s与t并在一起,占满8个字节,剩下的s占据16个字节,因此可得7<=A<=10.
+    
+    movq    %rax, 184(%rdi)     # *(%rdi + 184) = %rax => p->y
     # 说明str1的y从第184位开始的,因此184-8<A*B*4<=184
 ```
+
 根据汇编代码推出的三个公式:
+
 ```
 5<=B<=8
 7<=A<=10
@@ -201,37 +208,29 @@ A:
 |e1.y    |  8 |
 |e2.x    |  0 |
 |e2.next |  8 |
-```
+
 B:
+
 ```
 16
 ```
+
 C:
 ```asm
 proc:
-  # %rax = *(up+8) 可能是next也可能是y
-  movq 8(%rdi), %rax
+  # 可能是next也可能是y
+  movq 8(%rdi), %rax    # %rax = *(up + 8) => *(up->e2.next)
   
-  # %rdx = *( *(up+8) ), %rax 是一个指针
-  # 所以 *( *(up+8) ) 是 *(up->e2.next)
-  movq (%rax), %rdx
+  # %rdx = *(%rax), %rax是一个指针,在e2域中
+  movq (%rax), %rdx     # %rdx = *(*(up+8)) => *(up->e2.next)
 
-  # %rdx = *( *(up->e2.next) )
   # %rdx 也是一个指针
-  # 所以 %rdx 存储 *( *(up->e2.next).e1.p )
-  movq (%rdx), %rdx
+  movq (%rdx), %rdx     # %rdx = *(*(up->e2.next).e1.p)
 
-  # %rax 存储 *(up+8)
-  # %rax 是一个指针
-  # 所以 %rax = *( up->e2.next )
-  #
-  # 使用 subq %rdx 是一个长整形
-  # *( *(up->e2.next)+8 ) 是一个长整形
-  # 所以 8(%rax) 即 *(up->e2.next).e1.y
-  subq 8(%rax), %rdx
+  # 使用subq, %rdx是一个长整形 *(*(up->e2.next)+8)也是一个长整形
+  subq 8(%rax), %rdx   # %rdx -= *(*(up->e2.next)+8) => *(*(up->e2.next)).e2.y
 
-  # %rdi 在前面从来没有被改变
-  # 通过最后一句可以判断 (%rdi) 即为 up->e2.x
+  # 通过最后一句可以判断(%rdi)是个长整形即up->e2.x
   movq %rdx, (%rdi)
   ret
 ```
@@ -259,17 +258,12 @@ void proc(union ele *up){
 aframe:
     pushq   %rbp
     movq    %rsp, %rbp
-    subq    $16, %rsp
-    # 将栈顶地址减小16
-    leaq    30(,%rdi,8), %rax
-    # %rax = 8 * n + 30
-    andq    $-16, %rax
-    # 这里的原因跟课本中的那一处一样的道理,将后4位置0,成为最大的16的倍数.
-    subq    %rax, %rsp
-    # 将栈顶地址减小%rax位
+    subq    $16, %rsp           # 将栈顶地址减小16
+    leaq    30(,%rdi,8), %rax   # %rax = 8 * n + 30
+    andq    $-16, %rax          # 将后4位置0,成为最大的16的倍数.
+    subq    %rax, %rsp          # 将栈顶地址减小%rax位
     leaq    15(%rsp), %r8
-    andq    $-16, %r8
-    # 这两句是保证了p的地址是16的倍数,取最小的16的倍数.
+    andq    $-16, %r8           # 这两句是保证了p的地址是16的倍数,取最小的16的倍数.
 ```
 A:
 ```c
