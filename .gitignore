@@ -55,3 +55,4 @@ gen
 
 bin
 cmake-build-debug
+!/Chapter4/*.pdf
