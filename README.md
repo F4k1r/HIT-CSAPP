@@ -9,7 +9,9 @@ make
 ```
 在主文件夹 `bin` 目录下生成可执行文件。
 
-## 第二章作业
+## 作业
+
+转换命令：`pandoc filename.md -o filename.pdf --pdf-engine=xelatex -V CJKmainfont=WenQuanYi\ Micro\ Hei\ Mono`
 
 ## 实验一
 showbytes 使用说明：
@@ -24,7 +26,6 @@ Gcc –S hello.i –o hello.s  #编译，生成汇编代码（.s文件）：
 Gcc –c hello.s –o hello.o  #汇编，生成目标文件（.o文件）：
 Gcc hello.o –o hello.out   #链接，生成可执行文件：
 ```
-
 
 ## 实验二
 使用位运算实现各种功能。
