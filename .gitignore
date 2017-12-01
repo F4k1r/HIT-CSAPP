@@ -53,6 +53,10 @@ gen
 *.toc
 *.xdv
 
+# Chapter4 Sim
+*.ys
+*.yo
+
 bin
 cmake-build-debug
 !/Chapter4/*.pdf
