@@ -1,7 +1,36 @@
 \section{实验预习}
 \subsection{画出存储器层级结构，标识容量价格速度等指标变化（5分）}
 
-\subsection{用CPUZ等查看你的计算机Cache各参数，写出各级Cache的CSEBseb（5分）}
+\begin{tikzpicture}
+    \draw (0,0) -- (3.5,7) -- (7,0) -- (0,0);
+    \draw (0.5,1) -- (6.5,1);
+    \draw (1.0,2) -- (6.0,2);
+    \draw (1.5,3) -- (5.5,3);
+    \draw (2.0,4) -- (5.0,4);
+    \draw (2.5,5) -- (4.5,5);
+    \draw (3.0,6) -- (4.0,6);
+    \draw (3.5,0.5) node {远程二级存储};
+    \draw (3.5,1.5) node {本地二级存储};
+    \draw (3.5,2.5) node {主存(DRAM)};
+    \draw (3.5,3.5) node {L3};
+    \draw (3.5,4.5) node {L2};
+    \draw (3.5,5.5) node {L1};
+    \draw (3.5,6.2) node {Reg};
+    \draw [->] (-3.0, 0) -- (-3.0,7);
+    \draw (-2.0, 5) node {更小};
+    \draw (-2.0, 4) node {更快};
+    \draw (-2.0, 3) node {更贵};
+\end{tikzpicture}
+
+\subsection{用CPUZ等查看你的计算机Cache各参数，写出各级Cache的大小（5分）}
+
+\begin{tabular}{|c|c|c|c|c|}
+    \hline 
+    Cache & L1d & L1i & L2 & L3 \\ 
+    \hline 
+    大小 & 32k & 32k & 256k & 6144k \\ 
+    \hline 
+\end{tabular} 
 
 \subsection{写出各类Cache的读策略与写策略（5分）}
 

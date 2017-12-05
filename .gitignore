@@ -60,3 +60,4 @@ gen
 bin
 cmake-build-debug
 !/Chapter4/*.pdf
+!/report/计算机实验报告/Banner.pdf
