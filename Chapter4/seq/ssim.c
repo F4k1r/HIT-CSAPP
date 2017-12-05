@@ -17,7 +17,6 @@
 #define MAXBUF 1024
 
 #ifdef HAS_GUI
-#define USE_INTERP_RESULT 1
 #include <tk.h>
 #endif /* HAS_GUI */
 
