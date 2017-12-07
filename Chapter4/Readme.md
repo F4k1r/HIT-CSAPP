@@ -451,10 +451,191 @@ bool set_cc = icode in { IOPQ, IIADDQ };
 
 
 ## Should the condition codes be updated?
+/** bool set_cc = E_icode in { IOPQ, IIADDQ } &&              */
     bool set_cc = ( E_icode == IOPQ || E_icode == IIADDQ )&&
 #                                                 ^^^^^^
+
 ```
 
 ## 4.56
 
+|阶段|                         变量操作情况                         |
+|---|------------------------------------------------------------|
+| F |        icode:ifun = M1[PC];valC=M8[PC+1];valP=PC+9         |
+| D |                                                            |
+| E |                       Cnd = Cond(CC,ifun)                  |
+| M |                                                            |
+| W |                                                            |
+
+更新PC: PC = Cnd?valC:valP
+
+```hcl
+## What address should instruction be fetched at
+word f_pc = [
+	# Mispredicted branch.  Fetch at incremented PC
+
+	# 后向分支取指错误
+	M_icode == IJXX && M_ifun != UNCOND && M_valE < M_valA && !M_Cnd : M_valA;
+	# 前向分支未取错误
+	M_icode == IJXX && M_ifun != UNCOND && M_valE >= M_valA && M_Cnd : M_valE;
+
+	# Completion of RET instruction
+	W_icode == IRET : W_valM;
+	# Default: Use predicted value of PC
+	1 : F_predPC;
+];
+
+# Predict next value of PC
+word f_predPC = [
+	# BBTFNT: This is where you'll change the branch prediction rule
+	# 分支跳转
+	f_icode == IJXX && f_ifun != UNCOND && f_valC < f_valP : f_valC;
+    f_icode == IJXX && f_ifun != UNCOND && f_valC >= f_valP : f_valP;
+	f_icode in { IJXX, ICALL } : f_valC;
+	1 : f_valP;
+];
+
+## Select input A to ALU
+word aluA = [
+	E_icode in { IRRMOVQ, IOPQ } : E_valA;
+	E_icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ } : E_valC;
+	E_icode in { ICALL, IPUSHQ } : -8;
+	E_icode in { IRET, IPOPQ } : 8;
+	# 分支跳转
+	E_icode in { IJXX } : E_valC;
+	# Other instructions don't need ALU
+];
+
+## Select input B to ALU
+word aluB = [
+	E_icode in { IRMMOVQ, IMRMOVQ, IOPQ, ICALL, 
+		     IPUSHQ, IRET, IPOPQ } : E_valB;
+	E_icode in { IRRMOVQ, IIRMOVQ } : 0;
+	# 分支跳转
+	E_icode in { IJXX } : 0;
+	# Other instructions don't need ALU
+];
+
+bool D_bubble =
+	# Mispredicted branch
+    # 分支选择错误
+    (
+    (E_icode == IJXX && E_ifun != UNCOND && E_valC < E_valA && !e_Cnd) ||
+    (E_icode == IJXX && E_ifun != UNCOND && E_valC >= E_valA && e_Cnd)
+    ) ||
+	# BBTFNT: This condition will change
+	# Stalling at fetch while ret passes through pipeline
+	# but not condition for a load/use hazard
+	!(E_icode in { IMRMOVQ, IPOPQ } && E_dstM in { d_srcA, d_srcB }) &&
+	  IRET in { D_icode, E_icode, M_icode };
+
+# Should I stall or inject a bubble into Pipeline Register E?
+# At most one of these can be true.
+bool E_bubble =
+	# Mispredicted branch
+	# 分支选择错误
+	(
+	(E_icode == IJXX && E_ifun != UNCOND && E_valC < E_valA && !e_Cnd) ||
+	(E_icode == IJXX && E_ifun != UNCOND && E_valC >= E_valA && e_Cnd)
+	) ||
+	# BBTFNT: This condition will change
+	# Conditions for a load/use hazard
+	E_icode in { IMRMOVQ, IPOPQ } &&
+	 E_dstM in { d_srcA, d_srcB};
+```
 ## 4.58
+
+|阶段|    popq rA      |     popq2 rA   |
+|---|----------------------------------|
+| F |   valP=PC       |  valP=PC +2    |
+| D |   valB=R[rsp]   |  valB=R[rsp]   |
+| E |   valE=valB+8   |  valE=valB-8   |
+| M |                 |  valM=M8[valE] |
+| W |   R[rsp]=valE   |  R[rA]=valM    |
+
+```asm
+word f_icode = [
+     imem_error : INOP;
+     D_icode == IPOPQ : IPOP2;
+     1: imem_icode;
+ ];
+ 
+bool instr_valid = f_icode in 
+     { INOP, IHALT, IRRMOVQ, IIRMOVQ, IRMMOVQ, IMRMOVQ,
+       IOPQ, IJXX, ICALL, IRET, IPUSHQ, IPOPQ, IPOP2 };
+ 
+word f_predPC = [
+     f_icode in { IJXX, ICALL } : f_valC;
+     ## 1W: Want to refetch popq one time
+     f_icode == IPOPQ : f_pc;
+     1 : f_valP;
+ ];
+
+word d_srcA = [
+     D_icode in { IRRMOVQ, IRMMOVQ, IOPQ, IPUSHQ  } : D_rA;
+     D_icode in { IRET } : RRSP;
+     1 : RNONE; # Don't need register
+ ];
+
+word d_srcB = [
+     D_icode in { IOPQ, IRMMOVQ, IMRMOVQ  } : D_rB;
+     D_icode in { IPUSHQ, IPOPQ, IPOP2, ICALL, IRET } : RRSP;
+     1 : RNONE;  # Don't need register
+ ];
+
+word d_dstM = [
+     D_icode in { IMRMOVQ, IPOP2 } : D_rA;
+     1 : RNONE;  # Don't write any register
+ ];
+ 
+word aluA = [
+     E_icode in { IRRMOVQ, IOPQ } : E_valA;
+     E_icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ } : E_valC;
+     E_icode in { ICALL, IPUSHQ, IPOP2 } : -8;
+     E_icode in { IRET, IPOPQ } : 8;
+     # Other instructions don't need ALU
+ ];
+ 
+word aluB = [
+     E_icode in { IRMMOVQ, IMRMOVQ, IOPQ, ICALL, 
+              IPUSHQ, IRET, IPOPQ, IPOP2 } : E_valB;
+     E_icode in { IRRMOVQ, IIRMOVQ } : 0;
+     # Other instructions don't need ALU
+ ];
+ 
+word mem_addr = [
+     M_icode in { IRMMOVQ, IPUSHQ, ICALL, IMRMOVQ, IPOP2 } : M_valE;
+     M_icode in { IRET } : M_valA;
+     # Other instructions don't need address
+ ];
+ 
+bool mem_read = M_icode in { IMRMOVQ, IRET, IPOP2 };
+
+bool F_stall =
+     # Conditions for a load/use hazard
+     E_icode in { IMRMOVQ, IPOP2 } &&
+      E_dstM in { d_srcA, d_srcB } ||
+     # Stalling at fetch while ret passes through pipeline
+     IRET in { D_icode, E_icode, M_icode };
+     
+bool D_stall = 
+     # Conditions for a load/use hazard
+     E_icode in { IMRMOVQ, IPOP2 } &&
+      E_dstM in { d_srcA, d_srcB };
+      
+bool D_bubble =
+	# Mispredicted branch
+	(E_icode == IJXX && !e_Cnd) ||
+	# Stalling at fetch while ret passes through pipeline
+	# but not condition for a load/use hazard
+	!(E_icode in { IMRMOVQ, IPOP2 } && E_dstM in { d_srcA, d_srcB }) &&
+	# 1W: This condition will change
+	  IRET in { D_icode, E_icode, M_icode };
+	  
+bool E_bubble =
+	# Mispredicted branch
+	(E_icode == IJXX && !e_Cnd) ||
+	# Conditions for a load/use hazard
+	E_icode in { IMRMOVQ, IPOP2 } &&
+	 E_dstM in { d_srcA, d_srcB};
+```
