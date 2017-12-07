@@ -545,13 +545,13 @@ bool E_bubble =
 ```
 ## 4.58
 
-|阶段|    popq rA      |     popq2 rA   |
-|---|----------------------------------|
-| F |   valP=PC       |  valP=PC +2    |
-| D |   valB=R[rsp]   |  valB=R[rsp]   |
-| E |   valE=valB+8   |  valE=valB-8   |
-| M |                 |  valM=M8[valE] |
-| W |   R[rsp]=valE   |  R[rA]=valM    |
+| 阶段 |    popq rA        |       popq2 rA   |
+|-----|-------------------|------------------|
+|  F  |   valP = PC       |  valP = PC +2    |
+|  D  |   valB = R[rsp]   |  valB = R[rsp]   |
+|  E  |   valE = valB+8   |  valE = valB-8   |
+|  M  |                   |  valM = M8[valE] |
+|  W  |   R[rsp] = valE   |  R[rA] = valM    |
 
 ```hcl
 word f_icode = [
