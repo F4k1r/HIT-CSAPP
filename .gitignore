@@ -58,6 +58,13 @@ gen
 *.yo
 
 bin
+
 cmake-build-debug
+cmake-build-release
+cmake-build-relwithdebinfo
+cmake-build-minsizerel
+
 !/Chapter4/*.pdf
 !/report/计算机实验报告/Banner.pdf
+
+_Deparsed_XSubs.pm
