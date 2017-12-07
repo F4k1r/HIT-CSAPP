@@ -128,6 +128,71 @@ stack:
 
 ```
 
+使用条件传送修改代码
+
+```asm
+.pos 0
+    irmovq stack, %rsp
+    call main
+    halt
+    
+/** 测试数据 */
+.align 8
+data:
+  .quad 0x0000000000000004
+  .quad 0x0000000000000003
+  .quad 0x0000000000000002
+data_end:
+  .quad 0x0000000000000001
+
+main:
+    irmovq data, %rdi
+    irmovq data_end, %rsi
+    call sort
+    ret
+    
+sort:
+    jmp L2
+L3:
+    irmovq  $8, %r8
+	addq	%r8, %rax
+L5:
+/** cmpq	%rsi, %rax */
+    rrmovq  %rax, %r8
+    subq    %rsi, %r8 
+	
+	jge	L7
+	mrmovq	8(%rax), %rdx
+	mrmovq	(%rax), %rcx
+	
+/**--------------------*/
+/**     此处进行改写      */
+    rrmovq  %rdx, %r8
+    subq    %rcx, %r8
+	
+	cmovl	%rcx, 8(%rax)
+	cmovl	%rdx, (%rax)
+/**---------------------*/
+	jmp	L3
+L7:
+    irmovq  $8, %r8
+	subq	%r8, %rsi
+L2:
+/** cmpq	%rdi, %rsi */
+	rrmovq  %rsi, %r8
+    subq    %rdi, %r8 
+  
+	jle	L8
+	rrmovq	%rdi, %rax
+	jmp	L5
+L8:
+	ret
+
+.pos 500
+stack:
+
+```
+
 ## 4.50
 
 ## 4.52

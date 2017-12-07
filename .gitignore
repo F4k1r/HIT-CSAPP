@@ -68,3 +68,5 @@ cmake-build-minsizerel
 !/report/计算机实验报告/Banner.pdf
 
 _Deparsed_XSubs.pm
+
+!Chapter4/y86-code/*.ys
