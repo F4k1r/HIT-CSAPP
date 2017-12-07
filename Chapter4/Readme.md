@@ -553,7 +553,7 @@ bool E_bubble =
 | M |                 |  valM=M8[valE] |
 | W |   R[rsp]=valE   |  R[rA]=valM    |
 
-```asm
+```hcl
 word f_icode = [
      imem_error : INOP;
      D_icode == IPOPQ : IPOP2;
