@@ -188,7 +188,7 @@ L2:
 L8:
 	ret
 
-.pos 500
+.pos 0x200
 stack:
 
 ```
@@ -332,6 +332,77 @@ stack:
 
 
 ## 4.52
+
+|阶段|                         变量操作情况                         |
+|---|------------------------------------------------------------|
+| F | icode:ifun = M1[PC];rA:rB=M1[PC+1];valC=M8[PC+2];valP=PC+10|
+| D |                            valB=R[rB]                      |
+| E |                       valE=valB + valC;set CC              |
+| M |                                                            |
+| W |                            R[rB]=valE                      |
+
+```hcl
+bool instr_valid = icode in
+    { INOP, IHALT, IRRMOVQ, IIRMOVQ, IRMMOVQ, IMRMOVQ,
+        IOPQ, IJXX, ICALL, IRET, IPUSHQ, IPOPQ ,IIADDQ };
+#                                               ^^^^^^
+
+# Does fetched instruction require a regid byte?
+bool need_regids =
+	icode in { IRRMOVQ, IOPQ, IPUSHQ, IPOPQ,
+		     IIRMOVQ, IRMMOVQ, IMRMOVQ, IIADDQ };
+#                                       ^^^^^^
+
+# Does fetched instruction require a constant word?
+bool need_valC =
+    icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, IJXX, ICALL, IIADDQ };
+#                                                      ^^^^^^
+
+################ Decode Stage    ###################################
+
+## What register should be used as the B source?
+word srcB = [
+    icode in { IOPQ, IRMMOVQ, IMRMOVQ, IIADDQ } : rB;
+#                                      ^^^^^^
+    icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP;
+    1 : RNONE;  # Don't need register
+];
+
+## What register should be used as the E destination?
+word dstE = [
+    icode in { IRRMOVQ } && Cnd : rB;
+    icode in { IIRMOVQ, IOPQ, IIADDQ } : rB;
+#                             ^^^^^^
+    icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP;
+    1 : RNONE;  # Don't write any register
+];
+
+################ Execute Stage   ###################################
+
+## Select input A to ALU
+word aluA = [
+    icode in { IRRMOVQ, IOPQ } : valA;
+    icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ, IIADDQ } : valC;
+#                                         ^^^^^^
+    icode in { ICALL, IPUSHQ } : -8;
+    icode in { IRET, IPOPQ } : 8;
+    # Other instructions don't need ALU
+];
+
+## Select input B to ALU
+word aluB = [
+    icode in { IRMMOVQ, IMRMOVQ, IOPQ, ICALL,
+        IPUSHQ, IRET, IPOPQ, IIADDQ } : valB;
+#                            ^^^^^^
+    icode in { IRRMOVQ, IIRMOVQ } : 0;
+    # Other instructions don't need ALU
+];
+
+## Should the condition codes be updated?
+bool set_cc = icode in { IOPQ, IIADDQ };
+#                              ^^^^^^
+```
+
 
 ## 4.54
 
