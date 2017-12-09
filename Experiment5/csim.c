@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define MAXLRU (999)
+
 typedef struct CacheLine {
     int vilad;
-    int tag;
+    ulong tag;
     int access;
 } CacheLine;
 
@@ -26,11 +28,12 @@ typedef struct Cache {
 void printHelp();
 void initCache(Cache *pCache);
 void freeCache(Cache *pCache);
-int isHit(Cache *pCache, int tag, int setIndex);
-int updateCache(Cache *pCache, int tag, int setIndex);
-void loadCache(Cache *pCache, int *h, int *m, int *e, int addr, int size);
-void storeCache(Cache *pCache, int *h, int *m, int *e, int addr, int size);
-void modifyCache(Cache *pCache, int *h, int *m, int *e, int addr, int size);
+void updateLru(Cache *pCache, ulong tag, ulong setIndex);
+int isHit(Cache *pCache, ulong tag, ulong setIndex);
+int updateCache(Cache *pCache, ulong tag, ulong setIndex);
+void loadCache(Cache *pCache, int *h, int *m, int *e, ulong addr, int size);
+void storeCache(Cache *pCache, int *h, int *m, int *e, ulong addr, int size);
+void modifyCache(Cache *pCache, int *h, int *m, int *e, ulong addr, int size);
 
 int verbose;
 
@@ -61,22 +64,21 @@ int main(int argv, char **argc) {
     }
     initCache(&cache);
     char opt;
-    unsigned size, addr;
-    while (fscanf(tracefile, " %c %x,%u", &opt, &addr, &size) == 3) {
+    ulong size, addr;
+    while (fscanf(tracefile, " %c %lx,%lu", &opt, &addr, &size) == 3) {
         if (verbose)
-            printf("%c %x,%u ", opt, addr, size);
+            printf("%c %lx,%lu ", opt, addr, size);
         switch (opt) {
-        default:
         case 'L':loadCache(&cache, &hit_count, &miss_count, &eviction_count, addr, size);
             break;
         case 'S':storeCache(&cache, &hit_count, &miss_count, &eviction_count, addr, size);
             break;
         case 'M':modifyCache(&cache, &hit_count, &miss_count, &eviction_count, addr, size);
             break;
+        default:break;
         }
         if (verbose)
             printf("\n");
-
     }
 
     printSummary(hit_count, miss_count, eviction_count);
@@ -123,8 +125,8 @@ void freeCache(Cache *pCache) {
     free(pCache->sets);
 }
 
-void loadCache(Cache *pCache, int *h, int *m, int *e, int addr, int size) {
-    int tag, setIndex;
+void loadCache(Cache *pCache, int *h, int *m, int *e, ulong addr, int size) {
+    ulong tag, setIndex;
     addr = addr >> pCache->b;
     setIndex = addr & ((1 << pCache->s) - 1);
     tag = addr >> pCache->s;
@@ -145,28 +147,28 @@ void loadCache(Cache *pCache, int *h, int *m, int *e, int addr, int size) {
     }
 }
 
-void storeCache(Cache *pCache, int *h, int *m, int *e, int addr, int size) {
+void storeCache(Cache *pCache, int *h, int *m, int *e, ulong addr, int size) {
     loadCache(pCache, h, m, e, addr, size);
 }
 
-void modifyCache(Cache *pCache, int *h, int *m, int *e, int addr, int size) {
+void modifyCache(Cache *pCache, int *h, int *m, int *e, ulong addr, int size) {
     loadCache(pCache, h, m, e, addr, size);
     storeCache(pCache, h, m, e, addr, size);
 }
 
-int isHit(Cache *pCache, int tag, int setIndex) {
+int isHit(Cache *pCache, ulong tag, ulong setIndex) {
     for (int i = 0; i != pCache->E; ++i) {
         if (pCache->sets[setIndex].lines[i].vilad && pCache->sets[setIndex].lines[i].tag == tag) {
             for (int j = 0; j != pCache->E; ++j)
                 --pCache->sets[setIndex].lines[j].access;
-            pCache->sets[setIndex].lines[i].access += 2;
+            pCache->sets[setIndex].lines[i].access = MAXLRU;
             return 1;
         }
     }
     return 0;
 }
 
-int updateCache(Cache *pCache, int tag, int setIndex) {
+int updateCache(Cache *pCache, ulong tag, ulong setIndex) {
     int i, minAccseeIndex = 0, minAccess = pCache->sets[setIndex].lines[0].access;
     for (i = 0; i != pCache->E; ++i) {
         if (!pCache->sets[setIndex].lines[i].vilad) {
@@ -182,14 +184,14 @@ int updateCache(Cache *pCache, int tag, int setIndex) {
         pCache->sets[setIndex].lines[minAccseeIndex].tag = tag;
         for (int j = 0; j != pCache->E; ++j)
             --pCache->sets[setIndex].lines[j].access;
-        pCache->sets[setIndex].lines[minAccseeIndex].access += 2;
+        pCache->sets[setIndex].lines[minAccseeIndex].access = MAXLRU;
         return 1;
     } else {
         pCache->sets[setIndex].lines[i].vilad = 1;
         pCache->sets[setIndex].lines[i].tag = tag;
         for (int j = 0; j != pCache->E; ++j)
             --pCache->sets[setIndex].lines[j].access;
-        pCache->sets[setIndex].lines[i].access += 2;
+        pCache->sets[setIndex].lines[i].access = MAXLRU;
         return 0;
     }
 }
