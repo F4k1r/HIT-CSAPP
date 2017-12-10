@@ -22,13 +22,19 @@
     \draw (-2.0, 3) node {更贵};
 \end{tikzpicture}
 
-\subsection{用CPUZ等查看你的计算机Cache各参数，写出各级Cache的大小（5分）}
+\subsection{用CPUZ等查看你的计算机Cache各参数，写出各级Cache的C S E B s e b（5分）}
 
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
     \hline 
-    Cache & L1d & L1i & L2 & L3 \\ 
+    & C & S & E & B & s & e & b \\ 
     \hline 
-    大小 & 32k & 32k & 256k & 6144k \\ 
+    一级数据缓存 & 32kb & 64 & 8 & 64 & 6 & 3 & 6 \\ 
+    \hline 
+    一级指令缓存 & 32kb & 64 & 8 & 64 & 6 & 3 & 6 \\ 
+    \hline 
+    二级缓存 & 256kb & 64 & 64 & 512 & 6 & 2 & 9 \\ 
+    \hline 
+    三级缓存 & 6144kb & 64 & 64 & 3072 & 6 & $2+\log_23$ & $10+\log_23$ \\ 
     \hline 
 \end{tabular} 
 

@@ -6,6 +6,8 @@
 
 #define MAXLRU (999)
 
+typedef unsigned long ulong;
+
 typedef struct CacheLine {
     int vilad;
     ulong tag;
@@ -55,7 +57,7 @@ int main(int argv, char **argc) {
             tracefile = fopen(argc[++i], "re");
         } else if (0 == strncmp("-v", argc[i], 2)) {
             verbose = 1;
-        } else if (0 == strncmp("-v", argc[i], 2)) {
+        } else if (0 == strncmp("-h", argc[i], 2)) {
             printHelp();
             if (tracefile)
                 fclose(tracefile);
