@@ -23,12 +23,13 @@ char transpose_submit_desc[] = "Transpose submission";
 void transpose_submit(int M, int N, int A[N][M], int B[M][N]) {
     int m1, m2, m3, m4, m5, m6, m7, m8;
     int i, j, k, h;
-    if (N == 32) {
-        for (i = 0; i != N; ++i) {
-            for (j = 0; j != M; ++j) {
-                for (k = i * 8; k < (i + 1) * 8; ++k) {
-                    h = j * 8;
-                    m1 = A[k][h];
+    if (N == 32) {  // 32 x 32
+        for (i = 0; i < N; i += 8) {
+            for (j = 0; j < M; j += 8) {
+                // 拆成8x8
+                for (k = i; k < i + 8; ++k) {
+                    h = j;
+                    m1 = A[k][h + 0];
                     m2 = A[k][h + 1];
                     m3 = A[k][h + 2];
                     m4 = A[k][h + 3];
@@ -37,7 +38,7 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N]) {
                     m7 = A[k][h + 6];
                     m8 = A[k][h + 7];
 
-                    B[h][k] = m1;
+                    B[h + 0][k] = m1;
                     B[h + 1][k] = m2;
                     B[h + 2][k] = m3;
                     B[h + 3][k] = m4;
@@ -45,12 +46,14 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N]) {
                     B[h + 5][k] = m6;
                     B[h + 6][k] = m7;
                     B[h + 7][k] = m8;
+
                 }
             }
         }
-    } else if (N == 64) {
+    } else if (N == 64) { // 64 x 64
         for (i = 0; i < 64; i += 8) {
             for (j = 0; j < 64; j += 8) {
+                // 拆成 8 x 8
                 for (k = j; k < j + 4; ++k) {
                     m1 = A[k][i];
                     m2 = A[k][i + 1];
@@ -61,20 +64,25 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N]) {
                     m7 = A[k][i + 6];
                     m8 = A[k][i + 7];
 
+                    // 左上角复制
                     B[i][k] = m1;
-                    B[i][k + 4] = m5;
                     B[i + 1][k] = m2;
-                    B[i + 1][k + 4] = m6;
                     B[i + 2][k] = m3;
-                    B[i + 2][k + 4] = m7;
                     B[i + 3][k] = m4;
+                    // 右上角暂存
+                    B[i][k + 4] = m5;
+                    B[i + 1][k + 4] = m6;
+                    B[i + 2][k + 4] = m7;
                     B[i + 3][k + 4] = m8;
                 }
+
                 for (k = i; k < i + 4; ++k) {
+                    // 上一步存入到B右上角的数据
                     m1 = B[k][j + 4];
                     m2 = B[k][j + 5];
                     m3 = B[k][j + 6];
                     m4 = B[k][j + 7];
+                    // A的新数据
                     m5 = A[j + 4][k];
                     m6 = A[j + 5][k];
                     m7 = A[j + 6][k];
@@ -89,6 +97,7 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N]) {
                     B[k + 4][j + 2] = m3;
                     B[k + 4][j + 3] = m4;
                 }
+                // 右下角的处理
                 for (k = i + 4; k < i + 8; ++k) {
                     m1 = A[j + 4][k];
                     m2 = A[j + 5][k];
@@ -101,12 +110,15 @@ void transpose_submit(int M, int N, int A[N][M], int B[M][N]) {
                 }
             }
         }
-    } else {
-        for (i = 0; i != N; i += 16) {
-            for (j = 0; j != M; j += 16) {
-                for (k = i; (k != i + 16) && (k != N); ++k)
-                    for (h = j; (h != j + 16) && (k != M); ++h)
+    } else { // 61 x 67
+        for (i = 0; i < N; i += 16) {
+            for (j = 0; j < M; j += 16) {
+                // 拆成 16 x 16
+                for (k = i; k < i + 16 && k < N; k++) {
+                    for (h = j; h < j + 16 && h < M; h++) {
                         B[h][k] = A[k][h];
+                    }
+                }
             }
         }
     }

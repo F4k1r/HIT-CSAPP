@@ -8,3 +8,4 @@ add_executable(tracegen tracegen.c trans.c cachelab.c)
 
 file(COPY "traces" DESTINATION "./")
 file(COPY "test-csim" "csim-ref" DESTINATION "./")
+file(COPY "driver.py" DESTINATION "./")
