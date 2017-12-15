@@ -107,7 +107,7 @@ void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
 ## 5.18
 
 ```c
-// 原始版本
+// 消除不必要的内存引用
 double poly(double a[], double x, long degree) {
   long i;
   double result = a[0];
