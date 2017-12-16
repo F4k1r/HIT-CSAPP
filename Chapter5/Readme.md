@@ -107,6 +107,19 @@ void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
 ## 5.18
 
 ```c
+// honor版本
+double poly(double a[], double x, long degree) {
+  long i;
+  double result = a[degree];
+  for (i = degree-1; i >= 0; i--) {
+    result = a[i] + x*result;
+  }
+  return result;
+}
+```
+
+
+```c
 // 消除不必要的内存引用
 double poly(double a[], double x, long degree) {
   long i;
@@ -150,18 +163,5 @@ double poly(double a[], double x, long degree) {
   }
 
   return result + result1 + result2;
-}
-```
-
-
-```
-// honor版本
-double poly(double a[], double x, long degree) {
-  long i;
-  double result = a[degree];
-  for (i = degree-1; i >= 0; i--) {
-    result = a[i] + x*result;
-  }
-  return result;
 }
 ```
