@@ -1,4 +1,12 @@
-# 第五章
+---
+title: 第五章
+author: 冯云龙
+date: 2017/12/16
+geometry: margin=2cm
+output: pdf_document
+---
+
+
 ## 5.14
 ```
  +----+                          +----+
