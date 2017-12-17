@@ -95,19 +95,16 @@ void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
   data_t sum = (data_t) 0;
 
   for (i = 0; i < length-6; i+=6) {
-    sum = sum +
-      (
+    sum = sum + (
         udata[i] * vdata[i] +
         udata[i+1] * vdata[i+1] +
         udata[i+2] * vdata[i+2] +
         udata[i+3] * vdata[i+3] +
         udata[i+4] * vdata[i+4] +
-        udata[i+5] * vdata[i+5]
-      );
+        udata[i+5] * vdata[i+5] );
   }
-  for(; i < length; i++) {
+  for(; i < length; i++)
     sum = sum + udata[i] * vdata[i];
-  }
   *dest = sum;
 }
 ```
@@ -115,7 +112,7 @@ void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
 ## 5.18
 
 ```c
-// honor版本
+// honor
 double poly(double a[], double x, long degree) {
   long i;
   double result = a[degree];
@@ -156,20 +153,18 @@ double poly(double a[], double x, long degree) {
 
   double xpwr_step = x * x * x * x * x * x;
   for (; i <= degree - 6; i+=6) {
-    result = result + (a[i]*xpwr + a[i+1]*xpwr*x);
-    result1 = result1 + (a[i+2]*xpwr1 + a[i+3]*xpwr1*x);
-    result2 = result2 + (a[i+4]*xpwr2 + a[i+5]*xpwr2*x);
+    result  = result  + (a[i] * xpwr  + a[i+1] * xpwr  * x);
+    result1 = result1 + (a[i+2]*xpwr1 + a[i+3] * xpwr1 * x);
+    result2 = result2 + (a[i+4]*xpwr2 + a[i+5] * xpwr2 * x);
 
-    xpwr *= xpwr_step;
+    xpwr  *= xpwr_step;
     xpwr1 *= xpwr_step;
     xpwr2 *= xpwr_step;
   }
-
   for (; i <= degree; i++) {
     result = result + a[i]*xpwr;
     xpwr *= x;
   }
-
   return result + result1 + result2;
 }
 ```
