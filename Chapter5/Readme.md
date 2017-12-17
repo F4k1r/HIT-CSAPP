@@ -6,8 +6,7 @@ geometry: margin=2cm
 output: pdf_document
 ---
 
-
-## 5.14
+# 5.14
 ```
  +----+                          +----+
  |sum |                          | i  |
@@ -84,7 +83,7 @@ void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
 }
 ```
 
-## 5.16
+# 5.16
 
 ```c
 void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
@@ -109,7 +108,7 @@ void inner4(vec_ptr u, vec_ptr v, data_t *dest) {
 }
 ```
 
-## 5.18
+# 5.18
 
 ```c
 // honor
