@@ -124,14 +124,13 @@ double poly(double a[], double x, long degree) {
 
 
 ```c
-// 消除不必要的内存引用
 double poly(double a[], double x, long degree) {
   long i;
   double result = a[0];
-  double xpwr = x;
+  double xPow = x;
   for (i = 1; i <= degree; i++) {
-    result += a[i] * xpwr;
-    xpwr = x * xpwr;
+    result += a[i] * xPow;
+    xPow = x * xPow;
   }
   return result;
 }
@@ -146,23 +145,23 @@ double poly(double a[], double x, long degree) {
   double result1 = 0;
   double result2 = 0;
 
-  double xpwr = x;
-  double xpwr1 = x * x * x;
-  double xpwr2 = x * x * x * x * x;
+  double xPow = x;
+  double xPow1 = x * x * x;
+  double xPow2 = x * x * x * x * x;
 
-  double xpwr_step = x * x * x * x * x * x;
+  double step = x * x * x * x * x * x;
   for (; i <= degree - 6; i+=6) {
-    result  = result  + (a[i] * xpwr  + a[i+1] * xpwr  * x);
-    result1 = result1 + (a[i+2]*xpwr1 + a[i+3] * xpwr1 * x);
-    result2 = result2 + (a[i+4]*xpwr2 + a[i+5] * xpwr2 * x);
+    result  = result  + (a[i] * xPow  + a[i+1] * xPow  * x);
+    result1 = result1 + (a[i+2]*xPow1 + a[i+3] * xPow1 * x);
+    result2 = result2 + (a[i+4]*xPow2 + a[i+5] * xPow2 * x);
 
-    xpwr  *= xpwr_step;
-    xpwr1 *= xpwr_step;
-    xpwr2 *= xpwr_step;
+    xPow  *= step;
+    xPow1 *= step;
+    xPow2 *= step;
   }
   for (; i <= degree; i++) {
-    result = result + a[i]*xpwr;
-    xpwr *= x;
+    result = result + a[i]*xPow;
+    xPow *= x;
   }
   return result + result1 + result2;
 }
