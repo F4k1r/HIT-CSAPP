@@ -200,7 +200,6 @@ void eval(char *cmdline) {
         /*
          * Child  process
          */
-
         if (pid == 0) {
             /* Child unblocks signals */
             sigprocmask(SIG_UNBLOCK, &mask, NULL);
@@ -302,7 +301,6 @@ int builtin_cmd(char **argv) {
     } else if (0 == strcmp("jobs", argv[0])) {
         listjobs(jobs);
     } else if (0 == strcmp("quit", argv[0])) {
-
         exit(0);
     } else
         return 0; /* not a builtin command */
@@ -366,9 +364,9 @@ void do_bgfg(char **argv) {
  * waitfg - Block until process pid is no longer the foreground process
  */
 void waitfg(pid_t pid) {
-    while (pid == fgpid(jobs)) {
+    // 等待前台程序退出
+    while (pid == fgpid(jobs))
         sleep(0);
-    }
     return;
 }
 
@@ -399,7 +397,6 @@ void sigchld_handler(int sig) {
         } else
             unix_error("Wrong signal");
     }
-
     return;
 }
 
@@ -411,8 +408,8 @@ void sigchld_handler(int sig) {
 void sigint_handler(int sig) {
     pid_t pid = fgpid(jobs);
     if (pid != 0) {
-        printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, sig);
         deletejob(jobs, pid);
+        printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, sig);
         // 发送给进程组
         if (kill(-(pid), sig) < 0) {
             // 进程不存在
