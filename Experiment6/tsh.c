@@ -1,7 +1,7 @@
 /* 
  * tsh - A tiny shell program with job control
  * 
- * <1160300202 冯云龙>
+ * <along>
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -296,9 +296,7 @@ int parseline(const char *cmdline, char **argv) {
 int builtin_cmd(char **argv) {
     if (0 == strcmp("jobs", argv[0])) {
         listjobs(jobs);
-    } else if (0 == strcmp("fg", argv[0])) {
-        do_bgfg(argv);
-    } else if (0 == strcmp("bg", argv[0])) {
+    } else if (0 == strcmp("fg", argv[0]) || 0 == strcmp("bg", argv[0])) {
         do_bgfg(argv);
     } else if (0 == strcmp("quit", argv[0])) {
         exit(0);
@@ -363,7 +361,14 @@ void do_bgfg(char **argv) {
  */
 void waitfg(pid_t pid) {
     // 等待前台程序退出
-    while (pid == fgpid(jobs));
+    sigset_t mask;
+    // mask中的所有信号位置清零
+    if (sigemptyset(&mask) < 0)
+        perror("sigemptyset");
+    while (pid == fgpid(jobs)) {
+        // Shell等待信号到来，可能会更改前台程序状态
+        sigsuspend(&mask);
+    }
 }
 
 /*****************
@@ -381,15 +386,19 @@ void sigchld_handler(int sig) {
     pid_t pid;
     int status;
     while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
-        // 子程序正常退出
+        // 子程序正常退出，直接删除任务即可
         if (WIFEXITED(status)) {
             deletejob(jobs, pid);
-        } else // 程序已经中止
+        } else // 程序中止，将其状态变为STOP
         if (WIFSTOPPED(status)) {
+            getjobpid(jobs, pid)->state = ST;
             sigtstp_handler(WSTOPSIG(status));
-        } else // 程序异常退出
+            printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, WSTOPSIG(status));
+        } else // 程序异常退出，将其终止，而后删除任务
         if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT) {
             sigint_handler(WTERMSIG(status));
+            deletejob(jobs, pid);
+            printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, WTERMSIG(status));
         } else
             unix_error("Wrong signal");
     }
@@ -402,9 +411,8 @@ void sigchld_handler(int sig) {
  */
 void sigint_handler(int sig) {
     pid_t pid = fgpid(jobs);
+    // 保证只发送给前台程序
     if (pid != 0) {
-        deletejob(jobs, pid);
-        printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, sig);
         // 发送给进程组
         if (kill(-(pid), sig) < 0)
             if (errno != ESRCH) // 进程不存在
@@ -419,10 +427,8 @@ void sigint_handler(int sig) {
  */
 void sigtstp_handler(int sig) {
     pid_t pid = fgpid(jobs);
-    struct job_t *job = getjobpid(jobs, pid);
+    // 保证只发送给前台程序
     if (pid != 0) {
-        printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, sig);
-        job->state = ST;
         // 发送给进程组
         if (kill(-(pid), sig) < 0)
             if (errno != ESRCH) // 进程不存在
