@@ -294,16 +294,16 @@ int parseline(const char *cmdline, char **argv) {
  *    it immediately.  
  */
 int builtin_cmd(char **argv) {
-    if (0 == strcmp("fg", argv[0])) {
+    if (0 == strcmp("jobs", argv[0])) {
+        listjobs(jobs);
+    } else if (0 == strcmp("fg", argv[0])) {
         do_bgfg(argv);
     } else if (0 == strcmp("bg", argv[0])) {
         do_bgfg(argv);
-    } else if (0 == strcmp("jobs", argv[0])) {
-        listjobs(jobs);
     } else if (0 == strcmp("quit", argv[0])) {
         exit(0);
-    } else
-        return 0; /* not a builtin command */
+    } else /* not a builtin command */
+        return 0;
     return 1;
 }
 
@@ -356,8 +356,6 @@ void do_bgfg(char **argv) {
         printf("do_bgfg: Internal error\n");
         exit(0);
     }
-    /* $end handout */
-    return;
 }
 
 /* 
@@ -365,9 +363,7 @@ void do_bgfg(char **argv) {
  */
 void waitfg(pid_t pid) {
     // 等待前台程序退出
-    while (pid == fgpid(jobs))
-        sleep(0);
-    return;
+    while (pid == fgpid(jobs));
 }
 
 /*****************
@@ -397,7 +393,6 @@ void sigchld_handler(int sig) {
         } else
             unix_error("Wrong signal");
     }
-    return;
 }
 
 /* 
@@ -411,13 +406,10 @@ void sigint_handler(int sig) {
         deletejob(jobs, pid);
         printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, sig);
         // 发送给进程组
-        if (kill(-(pid), sig) < 0) {
-            // 进程不存在
-            if (errno != ESRCH)
+        if (kill(-(pid), sig) < 0)
+            if (errno != ESRCH) // 进程不存在
                 unix_error("kill error\n");
-        }
     }
-    return;
 }
 
 /*
@@ -431,12 +423,11 @@ void sigtstp_handler(int sig) {
     if (pid != 0) {
         printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, sig);
         job->state = ST;
-        if (kill(-(pid), sig) < 0) {
-            if (errno != ESRCH)
+        // 发送给进程组
+        if (kill(-(pid), sig) < 0)
+            if (errno != ESRCH) // 进程不存在
                 unix_error("kill error\n");
-        }
     }
-    return;
 }
 
 /*********************

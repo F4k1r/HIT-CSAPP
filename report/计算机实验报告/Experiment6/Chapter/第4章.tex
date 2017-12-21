@@ -1,0 +1,39 @@
+\section{TinyShell测试}
+
+\subsection{测试方法}
+针对tsh和参考shell程序tshref，完成测试项目4.1-4.15的对比测试，并将测试结果截图或者通过重定向保存到文本文件(例如：./sdriver.pl -t trace01.txt -s ./tsh -a "-p" > tshresult01.txt)。
+
+\subsection{测试结果评价}
+tsh与tshref的输出在一下两个方面可以不同：
+
+\begin{enumerate}
+\item PID
+\item 测试文件trace11.txt, trace12.txt和trace13.txt中的/bin/ps命令，每次运行的输出都会不同，但每个mysplit进程的运行状态应该相同。
+\end{enumerate}
+
+除了上述两方面允许的差异，tsh与tshref的输出相同则判为正确，如不同则给出原因分析。
+
+\subsection{自测试结果}
+
+\subsubsection{测试用例trace01.txt的输出截图(1分)}
+
+\begin{figure}[H]
+\begin{minipage}[c]{0.5\linewidth}
+    \centering
+    \caption{tsh测试结果}
+%    \includegraphics[width=0.7\linewidth]{}
+\end{minipage}
+\begin{minipage}[c]{0.5\linewidth}
+    \centering
+    \caption{tshref测试结果}
+%    \includegraphics[width=0.7\linewidth]{}
+\end{minipage}
+\end{figure}
+
+\paragraph{测试结论(相同/不同)，原因分析如下:}
+
+
+
+\subsection{自测试评分}
+
+根据节4.3的自测试结果，程序的测试评分为：\dlmu[3cm]{分数}
