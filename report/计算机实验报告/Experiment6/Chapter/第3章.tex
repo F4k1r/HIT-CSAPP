@@ -7,37 +7,40 @@
 
 \subsubsection{void eval(char *cmdline)函数(10分)}
 
-函数功能：
-参   数：
-处理流程：
-要点分析：
+\paragraph{函数功能：}执行命令行输入的命令，解析以空格分割的命令行参数，并构造最终会传递给execve的argv参数
+\paragraph{参   数：}用户的命令行输入的命令
+\paragraph{处理流程：}
+\paragraph{要点分析：}
 
 \subsubsection{int builtin\_cmd(char **argv)函数（5分）}
 
-函数功能：
-参   数：
-处理流程：
-要点分析：
+\paragraph{函数功能：}检查第一个命令是不是内置的外壳命令。这里所谓的内置外壳命令是quit，jobs，bg，fg。如果第一个不是内置命令，则返回0，否则执行内置命令，返回1
+\paragraph{参   数：}Shell命令参数列表
+\paragraph{处理流程：}
+\paragraph{要点分析：}
 
 \subsubsection{void do\_bgfg(char **argv) 函数（5分）}
 
-函数功能：
-参   数：
-处理流程：
-要点分析：
+\paragraph{函数功能：}执行内置的fg,bg命令
+\paragraph{参   数：}Shell命令参数列表
+\paragraph{处理流程：}
+\paragraph{要点分析：}
 
 \subsubsection{void waitfg(pid\_t pid) 函数（5分）}
 
-函数功能：
-参   数：
-处理流程：
-要点分析：
+\paragraph{函数功能：}等待处理PID，在此处是等待前台程序退出
+\paragraph{参   数：}需要等待退出的子进程PID
+\paragraph{处理流程：}
+\paragraph{要点分析：}
 
 \subsubsection{void sigchld\_handler(int sig) 函数（10分）}
 
-函数功能：  
-参   数：  
-处理流程：  
-要点分析：  
+\paragraph{函数功能：}处理SIGCHLD信号，这个信号处理程序回收子进程，如果子进程是僵尸进程，或者收到stop之类的信号时，进行调用
+\paragraph{参   数：}被捕获到的信号值
+\paragraph{处理流程：}
+\paragraph{要点分析：}
 
 \subsection{程序实现(tsh.c的全部内容)(10分)}
+%\lstinputlisting[language = c]{../../../Experiment6/tsh.c}
+
+\inputminted{c}{../../../Experiment6/tsh.c}

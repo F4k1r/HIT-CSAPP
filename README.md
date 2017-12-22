@@ -12,6 +12,7 @@ make
 ## 作业
 
 转换命令：`pandoc filename.md -o filename.pdf --pdf-engine=xelatex -V CJKmainfont=WenQuanYi\ Micro\ Hei\ Mono`
+latex编译命令： `latexmk --shell-escape -xelatex 实验报告.tex`
 
 ## 实验一
 showbytes 使用说明：

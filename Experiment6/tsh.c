@@ -393,11 +393,13 @@ void sigchld_handler(int sig) {
         if (WIFSTOPPED(status)) {
             getjobpid(jobs, pid)->state = ST;
             sigtstp_handler(WSTOPSIG(status));
-            printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, WSTOPSIG(status));
+            printf("Job [%d] (%d) stopped by signal %d\n",
+                   pid2jid(pid), pid, WSTOPSIG(status));
         } else // 程序异常退出，将其终止，而后删除任务
         if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT) {
             sigint_handler(WTERMSIG(status));
-            printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, WTERMSIG(status));
+            printf("Job [%d] (%d) terminated by signal %d\n",
+                   pid2jid(pid), pid, WTERMSIG(status));
             deletejob(jobs, pid);
         } else
             unix_error("Wrong signal");
@@ -486,7 +488,8 @@ int addjob(struct job_t *jobs, pid_t pid, int state, char *cmdline) {
                 nextjid = 1;
             strcpy(jobs[i].cmdline, cmdline);
             if (verbose) {
-                printf("Added job [%d] %d %s\n", jobs[i].jid, jobs[i].pid, jobs[i].cmdline);
+                printf("Added job [%d] %d %s\n",
+                       jobs[i].jid, jobs[i].pid, jobs[i].cmdline);
             }
             return 1;
         }
