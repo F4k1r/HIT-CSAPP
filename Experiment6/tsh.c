@@ -397,8 +397,8 @@ void sigchld_handler(int sig) {
         } else // 程序异常退出，将其终止，而后删除任务
         if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT) {
             sigint_handler(WTERMSIG(status));
-            deletejob(jobs, pid);
             printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, WTERMSIG(status));
+            deletejob(jobs, pid);
         } else
             unix_error("Wrong signal");
     }
