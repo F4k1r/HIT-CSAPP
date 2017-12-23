@@ -39,3 +39,9 @@ Gcc hello.o –o hello.out   #链接，生成可执行文件：
 
 ## 实验五
 Cache模拟器
+
+## 实验六
+TinyShell:小型Shell编写
+
+## 大作业
+SEQ处理器，Verilog实现

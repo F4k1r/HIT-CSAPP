@@ -16,31 +16,36 @@
 
 \paragraph{函数功能：}检查第一个命令是不是内置的外壳命令。这里所谓的内置外壳命令是quit，jobs，bg，fg。如果第一个不是内置命令，则返回0，否则执行内置命令，返回1
 \paragraph{参   数：}Shell命令参数列表
-\paragraph{处理流程：}
-\paragraph{要点分析：}
+\paragraph{处理流程：}如下图所示：
+%    \digraph[scale=0.5]{builtin}{
+%        randdir = LR;
+%        node [shape="box",fontname = "Noto Sans CJK SC"];
+%        "是否是内置命令" -> "执行内置命令"[label="是"];
+%        "执行内置命令" -> "返回1";
+%        "是否是内置命令" -> "返回0"[label="否"];
+%    }
+\paragraph{要点分析：}本函数比较简单，只要记得是内置命令的时候返回1即可。
 
 \subsubsection{void do\_bgfg(char **argv) 函数（5分）}
 
 \paragraph{函数功能：}执行内置的fg,bg命令
 \paragraph{参   数：}Shell命令参数列表
 \paragraph{处理流程：}
-\paragraph{要点分析：}
+\paragraph{要点分析：}重点是对命令的合法性进行判断，判断是否是一个数字，并判断jobid的合法性，而后在对jobid进行操作。
 
 \subsubsection{void waitfg(pid\_t pid) 函数（5分）}
 
 \paragraph{函数功能：}等待处理PID，在此处是等待前台程序退出
 \paragraph{参   数：}需要等待退出的子进程PID
 \paragraph{处理流程：}
-\paragraph{要点分析：}
+\paragraph{要点分析：}这里值得注意的是要注意在前台程序挂掉之前不能退出本函数，这里我使用了suspend函数用来进行线程同步。
 
 \subsubsection{void sigchld\_handler(int sig) 函数（10分）}
 
 \paragraph{函数功能：}处理SIGCHLD信号，这个信号处理程序回收子进程，如果子进程是僵尸进程，或者收到stop之类的信号时，进行调用
 \paragraph{参   数：}被捕获到的信号值
 \paragraph{处理流程：}
-\paragraph{要点分析：}
+\paragraph{要点分析：}这里值得注意的问题就是要捕获子进程的终止信号，而后对子进程进行回收操作。注意在这里要打印Stop和Terminal信息，并对不同的信号进行处理。
 
 \subsection{程序实现(tsh.c的全部内容)(10分)}
-%\lstinputlisting[language = c]{../../../Experiment6/tsh.c}
-
 \inputminted{c}{../../../Experiment6/tsh.c}
