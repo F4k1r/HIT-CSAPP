@@ -385,11 +385,12 @@ void waitfg(pid_t pid) {
 void sigchld_handler(int sig) {
     pid_t pid;
     int status;
+    // 当某一子进程结束、中断或恢复执行时，内核会发送SIGCHLD信号予其父进程。
     while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) {
         // 子程序正常退出，直接删除任务即可
         if (WIFEXITED(status)) {
             deletejob(jobs, pid);
-        } else // 程序中止，将其状态变为STOP
+        } else // 程序挂起，将其状态变为STOP
         if (WIFSTOPPED(status)) {
             getjobpid(jobs, pid)->state = ST;
             sigtstp_handler(WSTOPSIG(status));
