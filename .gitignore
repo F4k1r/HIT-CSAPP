@@ -58,18 +58,10 @@ gen
 *.yo
 
 bin
+tags
+cmake-build-*
 
-cmake-build-debug
-cmake-build-release
-cmake-build-relwithdebinfo
-cmake-build-minsizerel
-
-!/Chapter4/*.pdf
 !/report/计算机实验报告/Banner.pdf
-
-_Deparsed_XSubs.pm
-
 !Chapter4/y86-code/*.ys
 !Chapter4/answer-code/*.ys
 
-tags
