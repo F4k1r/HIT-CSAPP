@@ -3,7 +3,7 @@ project(CSCPP C)
 
 set(CMAKE_C_STANDARD 99)
 
-#set(CHAPTER ON)
+set(CHAPTER ON)
 set(EXPERIMENT ON)
 
 if (CHAPTER)
@@ -12,6 +12,7 @@ if (CHAPTER)
     add_subdirectory(Chapter4)
     add_subdirectory(Chapter5)
     add_subdirectory(Chapter6)
+    add_subdirectory(Chapter8)
 endif ()
 if (EXPERIMENT)
     add_subdirectory(Experiment1)
