@@ -1,34 +1,7 @@
----
-title: 第八章
-author: 冯云龙
-date: 2017/12/16
-geometry: margin=2cm
-documentclass: ctexart
-output: pdf_document
----
+//
+// Created by along on 17-12-28.
+//
 
-# 8.12
-8个。
-
-# 8.16
-2。
-
-# 8.20
-```c
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-
-int main(int argc,char* argv[],char* env[]){
-  if(execve("/bin/ls",argv,env)==-1){
-    fprintf(stderr, "execve error\n");
-    exit(EXIT_FAILURE);
-  }
-}
-```
-
-# 8.24
-```c
 #include "csapp.h"
 #define N 2
 #define MAXLEN (50)
@@ -64,4 +37,3 @@ int main() {
 
     exit(EXIT_SUCCESS);
 }
-```
