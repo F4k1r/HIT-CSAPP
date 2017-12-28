@@ -51,16 +51,48 @@ D.
 假设有一个输入文件 hello.txt ，由字符串"Hello,world!\n"组成，编写一个C语言程序，
 使用mmap将 hello.txt 的内容改变为"Jello,world!\n"。
 
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+
+int main() {
+    int fd;
+    char *buf = NULL;
+    struct stat stat;
+    const char *path = "hello.txt";
+
+    // 使用文件描述符
+    fd = open(path, O_RDWR | O_CLOEXEC, 0);
+    if (fd < 0) {
+        perror("open()");
+        exit(EXIT_FAILURE);
+    }
+    fstat(fd, &stat);
+
+    // 使用mmap函数将文件映射到内存中
+    buf = mmap(NULL, (size_t) stat.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+    buf[0] = 'J';
+    close(fd);
+    exit(EXIT_SUCCESS);
+}
+```
+
+# 9.16
+确定下面对齐要求的每个组合的最小块大小。
+假设：显式空闲链表、每个空闲块中有四个字节的pred和succ指针、不允许有效载荷的大小为0,并且头部和脚部存放在一个四字节的字中。
+
 |对齐要求|已分配块|空闲块|最小块大小(字节)|
 |---|---------|-------|--------------|
 |单字|头部和脚部|头部和脚部|              |
 |单字|头部无脚部|头部和脚部|              |
 |双字|头部和脚部|头部和脚部|              |
 |双字|头部无脚部|头部和脚部|              |
-
-# 9.16
-确定下面对齐要求的每个组合的最小块大小。假设：显式空闲链表、每个空闲块中有四个字节
-的pred和succ指针、不允许有效载荷的大小为0,并且头部和脚部存放在一个四字节的字中。
 
 # 9.18
 编写你自己的malloc和free版本，将它的运行时间和空间利用率与标准C库提供的malloc版本比较。

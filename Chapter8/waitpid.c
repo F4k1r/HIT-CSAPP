@@ -14,6 +14,7 @@ int main() {
     for (i = 0; i < N; ++i) {
         if ((pid = Fork()) == 0) {
             char *cp = "Hello";
+            // 产生一个错误
             cp[0] = 'h';
         }
     }
@@ -24,6 +25,7 @@ int main() {
             printf("child %d terminated normally with exit status=%d\n", pid, WEXITSTATUS(status));
         } else if (WIFSIGNALED(status)) {
             char buf[MAXLEN];
+            // 添加代码以打印相关错误
             sprintf(buf, "child %d terminated by signal %d", pid, WTERMSIG(status));
             psignal(WTERMSIG(status), buf);
         } else {
