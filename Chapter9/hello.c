@@ -27,6 +27,7 @@ int main() {
     buf = mmap(NULL, (size_t) stat.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
     buf[0] = 'J';
+    munmap(buf, (size_t) stat.st_size);
     close(fd);
     exit(EXIT_SUCCESS);
 }
