@@ -3,7 +3,7 @@ project(CSCPP C)
 
 set(CMAKE_C_STANDARD 99)
 
-set(CHAPTER ON)
+#set(CHAPTER ON)
 set(EXPERIMENT ON)
 
 if (CHAPTER)
