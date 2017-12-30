@@ -33,7 +33,7 @@
 /*
  * If NEXT_FIT defined use next fit search, else use first fit search 
  */
-#define NEXT_FITx
+#define NEXT_FIT
 
 /* Team structure */
 team_t team = {
@@ -315,10 +315,8 @@ static void *coalesce(void *bp) {
     }
 
 #ifdef NEXT_FIT
-    /* Make sure the rover isn't pointing into the free block */
-    /* that we just coalesced */
-    if ((rover > (char *)bp) && (rover < NEXT_BLKP(bp)))
-    rover = bp;
+    if ((rover > (char *) bp) && (rover < NEXT_BLKP(bp)))
+        rover = bp;
 #endif
 
     return bp;
