@@ -5,11 +5,6 @@
 #include "mm.h"
 #include "memlib.h"
 
-/*
- * If NEXT_FIT defined use next fit search, else use first fit search
- */
-#define NEXT_FIT
-
 /* Team structure */
 team_t team = {
     "implicit next fit",
