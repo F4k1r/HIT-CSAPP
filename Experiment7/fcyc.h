@@ -11,7 +11,7 @@
 typedef void (*test_funct)(void *);
 
 /* Compute number of cycles used by test function f */
-double fcyc(test_funct f, void* argp);
+double fcyc(test_funct f, void *argp);
 
 /*********************************************************
  * Set the various parameters used by measurement routines 

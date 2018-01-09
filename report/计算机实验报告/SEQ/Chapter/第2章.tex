@@ -94,11 +94,11 @@
 
 \subsection{使用iaddq指令重写教材图4-6中的sum函数}
 
-\begin{lstlisting}
+\begin{minted}{gas}
 sum:
-    xorq %rax,%rax
-    andq %rsi,%rsi
-    jmp test
+    xorq   %rax,%rax
+    andq   %rsi,%rsi
+    jmp    test
 loop:
     mrmovq (%rdi),%r10
     addq   %r10,%rax
@@ -107,5 +107,6 @@ loop:
 test:
     jne loop
     ret
-\end{lstlisting}
+\end{minted}
+
 

@@ -11,9 +11,6 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 
-% 插入附件
-\usepackage{navigator}
-
 % 引用链接可点击
 \usepackage{cite}
 \usepackage[colorlinks,linkcolor=black,anchorcolor=blue,citecolor=green]{hyperref}
@@ -24,6 +21,7 @@
 % 绘制各种图形，包括电路图，函数图
 \usepackage{tikz}
 \usepackage{pgfplots}
+\usepackage{graphviz}
 
 \makeatletter
 \newcommand\dlmu[2][4cm]{\hskip1pt\underline{\hb@xt@ #1{\hss#2\hss}}\hskip3pt}
@@ -32,11 +30,11 @@
 
 % 标题居左 显示成如下情况 一、标题
 \ctexset{
-	section={
-		name={第,章},
-		number=\arabic{section},
-		format=\Large\bfseries\raggedright\heiti
-	},
+    section={
+        name={第,章},
+        number=\arabic{section},
+        format=\Large\bfseries\raggedright\heiti
+    },
 }
 
 % 设置页眉
@@ -47,34 +45,36 @@
 
 % 用于插入C代码
 \usepackage{listings}
+\usepackage[cache=false,
+langlinenos=true
+]{minted}
 
 
 % 调整代码的背景和风格
 \usepackage{xcolor}
 \lstset{
-	%行号
-	numbers=left,
-	%背景框
-	framexleftmargin=10mm,
-	frame=none,
-	%背景色
-	%backgroundcolor=\color[rgb]{1,1,0.76},
-	backgroundcolor=\color[RGB]{245,245,244},
-	%样式
-	keywordstyle=\bf\color{blue},
-	identifierstyle=\bf,
-	numberstyle=\color[RGB]{0,192,192},
-	commentstyle=\it\color[RGB]{0,96,96},
-	stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
-	%显示空格
-	showstringspaces=false
+    %行号
+    numbers=left,
+    %背景框
+    framexleftmargin=10mm,
+    frame=none,
+    %背景色
+    %backgroundcolor=\color[rgb]{1,1,0.76},
+    backgroundcolor=\color[RGB]{245,245,244},
+    %样式
+    keywordstyle=\bf\color{blue},
+    identifierstyle=\bf,
+    numberstyle=\color[RGB]{0,192,192},
+    commentstyle=\it\color[RGB]{0,96,96},
+    stringstyle=\rmfamily\slshape\color[RGB]{128,0,0},
+    %显示空格
+    showstringspaces=false
 }
 
 
 \bibliographystyle{plain}
 
 \numberwithin{figure}{section}
-
 
 \begin{document}
 \heiti
