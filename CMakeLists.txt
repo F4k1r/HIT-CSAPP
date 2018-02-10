@@ -3,6 +3,8 @@ project(CSCPP C)
 
 set(CMAKE_C_STANDARD 99)
 
+set(CMAKE_BINARY_DIR bin)
+
 set(CHAPTER ON)
 set(EXPERIMENT ON)
 
@@ -12,6 +14,7 @@ if (${CHAPTER} STREQUAL ON)
     add_subdirectory(Chapter4)
     add_subdirectory(Chapter5)
     add_subdirectory(Chapter6)
+    add_subdirectory(Chapter7)
     add_subdirectory(Chapter8)
     add_subdirectory(Chapter9)
 endif ()
